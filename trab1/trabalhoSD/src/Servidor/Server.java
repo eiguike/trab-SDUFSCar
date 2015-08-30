@@ -95,13 +95,26 @@ public class Server extends Thread {
 	// Sobre carga da função run da biblioteca Thread
 	public void run() {
 		Integer i;
+		Client auxClient;
 		Node aux = null;
+
+		if(actualNode.getId() == 1){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ex) {
+				Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+			}
+			actualNode.setClock(actualNode.getClock()+1);
+			auxClient = new Client(actualNode.getId(),actualNode);
+			auxClient.start();
+		}
 		// Loop para manter as threads vivas e com o servidor aberto
 		do {
 			try {
-				// Abrindo o socket na porta 8001
-				server = new ServerSocket(8001);
+				// Abrindo o socket na porta 8000
+				server = new ServerSocket(8000+actualNode.getId());
 				// Aguarda uma conexão na porta especificada e retorna o socket que irá comunicar
+				//System.out.println(actualNode.getId()+ ": Pronto para receber mensagens...");
 				client = server.accept();
 
 				// Cria um BufferedReader para o canal da stream de input de dados do socketclient 
@@ -111,11 +124,22 @@ public class Server extends Thread {
 
 				// quando a mensagem é recebida, ele adiciona na fila
 				aux = (Node) input.readObject();
-				System.out.println("recebi o objeto");
-				System.out.println(aux.getClock());
-				if(!aux.isThank())
+
+				// verifica se a mensagem recebida é um agradecimento
+				if(aux.isThank() != true){
+					System.out.println(actualNode.getId() + ": Recebi mensagem de: "+aux.getId());
+					actualNode.setThank(true);
+					actualNode.setIdTarget(aux.getId());
+					actualNode.setClock(actualNode.getClock()+1);
+					auxClient = new Client(actualNode.getId(),actualNode);	
+					auxClient.start();
 					queue.add(aux);
-				//while(queue.isEmpty() || aux.getClock() < queue.get(i))	
+				}else{
+					System.out.println(actualNode.getId()+": Recebi ACK de "+aux.getId());
+				}
+
+				server.close();
+				client.close();
 
 			} catch (IOException e) {
 			} catch (ClassNotFoundException ex) {

@@ -16,11 +16,15 @@ import java.util.ArrayList;
 public class Principal {
 
 	public static void main(String[] args) throws IOException {
-		Server server = new Server(1,2);
-		Client client = new Client(1);
+		ArrayList <Server> list = new ArrayList<Server>();
+		Integer i;
+		Server server;
 
-		server.start();
-		client.start();
+		for(i=0;i<2;i++){
+			server = new Server(0+i,2+i);
+			server.start();
+			list.add(server);
+		}
 	}
 
 }

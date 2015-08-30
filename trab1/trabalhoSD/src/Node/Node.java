@@ -15,6 +15,15 @@ public class Node implements Serializable{
 	private Integer clock;
 	private Integer id;
 	private boolean thank;
+	private Integer idTarget;
+
+	public Integer getIdTarget() {
+		return idTarget;
+	}
+
+	public void setIdTarget(Integer idTarget) {
+		this.idTarget = idTarget;
+	}
 
 	public boolean isThank() {
 		return thank;
