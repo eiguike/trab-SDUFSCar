@@ -11,13 +11,16 @@
  */
 package Servidor;
 
+import Node.Node;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,17 +31,56 @@ import java.util.logging.Logger;
  */
 public class Server extends Thread {
 
+	// informações de outros nós e do nó atual
+	private ArrayList<Node> queue;
+	private Node actualNode;
+
+	// variáveis necessárias para os sockets
 	private Thread t;
 	private String threadName;
 	private ServerSocket server = null;
 	private Socket client = null;
-	//private BufferedReader input = null;
 	private ObjectInputStream input = null;
 
+	private Socket clientMessage = null;
+
+	public void sentMessage(Integer clock, Integer id, Boolean thank) {
+		Integer i;
+		Node aux = new Node();
+		aux.setClock(clock);
+		aux.setId(id);
+		aux.setThank(thank);
+
+		for (i = 0; i < 5; i++) {
+			try {
+				clientMessage = new Socket("127.0.0.1", 8000 + i);
+				ObjectOutputStream output = new ObjectOutputStream(clientMessage.getOutputStream());
+				output.flush();
+				output.writeObject(aux);
+				output.close();
+			} catch (IOException ex) {
+				Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+			} finally {
+				try {
+					clientMessage.close();
+				} catch (IOException ex) {
+					Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+		}
+	}
+
 	// Construtor do servidor, ainda não com a thread criada...
-	Server(Integer i) {
+	Server(Integer i, Integer clock) {
+		// define clock e a identificação do nó
+		actualNode = new Node();
+		actualNode.setClock(clock);
+		actualNode.setId(i);
+
+		// nome da thread, ou o q identifica o nó
 		threadName = "Servidor" + i;
 		System.out.println("Criando thread: " + threadName);
+		queue = new ArrayList<Node>();
 	}
 
 	// Criando uma thread, no java cada thread executaria a função
@@ -52,10 +94,8 @@ public class Server extends Thread {
 
 	// Sobre carga da função run da biblioteca Thread
 	public void run() {
-		// String utilizada para quando o servidor deve continuar,
-		// ou então fechar...
-		String manipular;
-
+		Integer i;
+		Node aux = null;
 		// Loop para manter as threads vivas e com o servidor aberto
 		do {
 			try {
@@ -67,20 +107,16 @@ public class Server extends Thread {
 				// Cria um BufferedReader para o canal da stream de input de dados do socketclient 
 				input = new ObjectInputStream(client.getInputStream());
 				// Lê-se a input de dados feita pelo socket
-				System.out.println(input.readObject().toString());
+				//System.out.println(input.readObject().toString());
 
-				// Quando termina-se o processo de recebimento, fecha-se o socket
-				// e assim, é posto para dormir a thread atual para que outra 
-				// thread possa realizar o processo de criação de socket
-				try {
-					client.close();
-					server.close();
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-				}
+				// quando a mensagem é recebida, ele adiciona na fila
+				aux = (Node) input.readObject();
+				System.out.println("recebi o objeto");
+				System.out.println(aux.getClock());
+				if(!aux.isThank())
+					queue.add(aux);
+				//while(queue.isEmpty() || aux.getClock() < queue.get(i))	
 
-				// Caso a string que foi mandada foi Fechar, encerra-se o programa...
-				// Possível bug é que as threads não se fecharão, apenas uma no caso.
 			} catch (IOException e) {
 			} catch (ClassNotFoundException ex) {
 				Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);

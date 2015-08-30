@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class Principal {
 
 	public static void main(String[] args) throws IOException {
-		Server server = new Server(1);
+		Server server = new Server(1,2);
 		Client client = new Client(1);
 
 		server.start();

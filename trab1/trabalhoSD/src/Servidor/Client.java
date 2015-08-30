@@ -1,5 +1,6 @@
 package Servidor;
 
+import Node.Node;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +19,7 @@ public class Client extends Thread {
 	private String threadName;
 
 	Client(Integer i) {
-		threadName = "Client "+i;
+		threadName = "Client " + i;
 		client = null;
 		System.out.println("Criando thread cliente: " + threadName);
 	}
@@ -37,15 +38,20 @@ public class Client extends Thread {
 			//Cria o socket com o recurso desejado na porta especificada  
 			client = new Socket("127.0.0.1", 8001);
 
-			//input = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			output = new ObjectOutputStream(client.getOutputStream());
+			Node aux = new Node();
+			aux.setClock(24);
+			aux.setId(23);
+			aux.setThank(false);
+
+			ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
+			
 			output.flush();
-			output.writeObject("HAHAHAHAAHHA");
+			output.writeObject(aux);
 			output.close();
 
 			//Trata possíveis exceções  
 		} catch (IOException e) {
-			System.out.println("Algum problema ocorreu ao criar ou enviar dados pelo socket.");
+			System.out.println(e);
 		} finally {
 
 			try {
