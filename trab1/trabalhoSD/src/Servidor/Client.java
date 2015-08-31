@@ -17,14 +17,16 @@ public class Client extends Thread {
 	private BufferedReader input;
 	private ObjectOutputStream output;
 	private Node actualNode;
+        private Integer threadsNum;
 
 	private Thread thread;
 	private String threadName;
 
-	Client(Integer i, Node message) {
+	Client(Integer i, Node message, Integer threadsNum) {
 		actualNode = message;
 		threadName = "Client " + i;
 		client = null;
+                this.threadsNum = threadsNum;
 	}
 
 	// Criando uma thread, no java cada thread executaria a função
@@ -66,7 +68,7 @@ public class Client extends Thread {
 			}
 		} else {
 			System.out.println(actualNode.getId()+": Enviando mensagem para todos");
-			for (i = 0; i < 5; i++) {
+			for (i = 0; i < threadsNum; i++) {
 				try {
 					//Cria o socket com o recurso desejado na porta especificada  
 					client = new Socket("127.0.0.1", 8000 + i);

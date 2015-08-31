@@ -19,12 +19,14 @@ public class Principal {
 		ArrayList <Server> list = new ArrayList<Server>();
 		Integer i;
 		Server server;
+                Integer threadsNum = 3;
 
-		for(i=0;i<2;i++){
-			server = new Server(0+i,2+i);
+		for(i=0;i<threadsNum;i++){
+			server = new Server(0+i,2+i, threadsNum);
 			server.start();
 			list.add(server);
 		}
+                
 	}
 
 }

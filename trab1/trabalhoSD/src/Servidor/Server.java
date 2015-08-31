@@ -41,6 +41,7 @@ public class Server extends Thread {
 	private ServerSocket server = null;
 	private Socket client = null;
 	private ObjectInputStream input = null;
+        private Integer threadsNum;
 
 	private Socket clientMessage = null;
 
@@ -71,11 +72,13 @@ public class Server extends Thread {
 	}
 
 	// Construtor do servidor, ainda não com a thread criada...
-	Server(Integer i, Integer clock) {
+	Server(Integer i, Integer clock, Integer threadsNum) {
 		// define clock e a identificação do nó
 		actualNode = new Node();
 		actualNode.setClock(clock);
 		actualNode.setId(i);
+                
+                this.threadsNum = threadsNum;
 
 		// nome da thread, ou o q identifica o nó
 		threadName = "Servidor" + i;
@@ -105,7 +108,7 @@ public class Server extends Thread {
 				Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 			}
 			actualNode.setClock(actualNode.getClock()+1);
-			auxClient = new Client(actualNode.getId(),actualNode);
+			auxClient = new Client(actualNode.getId(),actualNode, threadsNum);
 			auxClient.start();
 		}
 		// Loop para manter as threads vivas e com o servidor aberto
@@ -124,14 +127,16 @@ public class Server extends Thread {
 
 				// quando a mensagem é recebida, ele adiciona na fila
 				aux = (Node) input.readObject();
+                                
+                                // incrementa o clock para o máximo entre seu próprio clock e o da mensagem recebida
+                                actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock())+1);
 
 				// verifica se a mensagem recebida é um agradecimento
 				if(aux.isThank() != true){
 					System.out.println(actualNode.getId() + ": Recebi mensagem de: "+aux.getId());
 					actualNode.setThank(true);
 					actualNode.setIdTarget(aux.getId());
-					actualNode.setClock(actualNode.getClock()+1);
-					auxClient = new Client(actualNode.getId(),actualNode);	
+					auxClient = new Client(actualNode.getId(),actualNode, threadsNum);	
 					auxClient.start();
 					queue.add(aux);
 				}else{
