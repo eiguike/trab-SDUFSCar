@@ -18,6 +18,16 @@ public class Node implements Serializable{
 	private boolean send;
 	private Integer idTarget;
 
+	public void printf(){
+		System.out.println("-----------------");
+		System.out.println("Clock: "+this.clock);
+		System.out.println("ID: "+this.id);
+		System.out.println("Thank: "+this.thank);
+		System.out.println("Send: "+this.send);
+		System.out.println("ID Target: "+this.idTarget);
+		System.out.println("-----------------");
+	}
+
 	public boolean isSend() {
 		return send;
 	}

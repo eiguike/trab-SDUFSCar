@@ -77,6 +77,7 @@ public class Server extends Thread {
 
 	// Sobre carga da função run da biblioteca Thread
 	public void run() {
+		ArrayList<Client> listClient = new ArrayList<Client>();
 		Integer i;
 		Client auxClient;
 		Node aux = null;
@@ -90,35 +91,42 @@ public class Server extends Thread {
 				//System.out.println(actualNode.getId()+ ": Pronto para receber mensagens...");
 				client = server.accept();
 
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException ex) {
+					Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+				}
+
 				input = new ObjectInputStream(client.getInputStream());
 
 				//quando a mensagem é recebida, ele adiciona na fila
 				aux = (Node) input.readObject();
 
-				// incrementa o clock para o máximo entre seu próprio clock e o da mensagem recebida
-				if ((aux.isSend() == true) && (aux.isThank() == true)) {
-					// se for de mensagem de comando não faça nada...
-				}else{
-					actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
-				}
-
-				// verifica se a mensagem recebida é um agradecimento
-				if (aux.isThank() != true) {
-					// mensagem não é um agradecimento, é feito um aviso qu recebeu
-					// e enviado uma mensagem de agradecimento, posteriormente
-					// é adicionado na fila
-					System.out.println(actualNode.getId() + ": Recebi mensagem de: " + aux.getId());
-					actualNode.setThank(true);
-					actualNode.setIdTarget(aux.getId());
-					if (!actualNode.getId().equals(aux.getId())) {
-						auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
-						auxClient.start();
-					}
-					queue.add(aux);
+				if (aux.isSend()) {
+					// caso a mensagem seja de comando, então é feito o envio para todas os
+					// processos que o processo atual quer utilizar tal recurso
+					System.out.println(actualNode.getId() + ": Recebi comando de enviar mensagem...");
+					actualNode.setThank(false);
+					actualNode.setSend(false);
+					actualNode.setClock(actualNode.getClock() + 1);
+					auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+					auxClient.start();
+					listClient.add(auxClient);
 				} else {
-					// caso a mensagem seja de fato um agradecimenot, é verificado
-					// se não é uma mensagem de comando para entrar na fila
-					if (aux.isSend() == false) {
+					actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
+					if (!aux.isThank()) {
+						// e enviado uma mensagem de agradecimento, posteriormente
+						// é adicionado na fila
+						System.out.println(actualNode.getId() + ": Recebi mensagem de: " + aux.getId());
+						actualNode.setThank(true);
+						actualNode.setIdTarget(aux.getId());
+						if (!actualNode.getId().equals(aux.getId())) {
+							auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+							auxClient.start();
+							listClient.add(auxClient);
+						}
+						queue.add(aux);
+					} else {
 						// se não for uma mensagem de comando, é avisado que recebeu ACK do processo
 						// e então adicionado no númeor de ACKs, caso os ACKs sejam iguais o númeor
 						// de threads existentes, é setado em true uma flag waitingToSend
@@ -128,15 +136,7 @@ public class Server extends Thread {
 							System.out.println(actualNode.getId() + ": Só esperando minha vez...");
 							this.waitingToSend = true;
 						}
-					} else {
-						// caso a mensagem seja de comando, então é feito o envio para todas os
-						// processos que o processo atual quer utilizar tal recurso
-						System.out.println(actualNode.getId() + ": Recebi comando de enviar mensagem...");
-						actualNode.setThank(false);
-						actualNode.setSend(false);
-						actualNode.setClock(actualNode.getClock()+1);
-						auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
-						auxClient.start();
+						// mensagem normal de pedido
 					}
 				}
 
