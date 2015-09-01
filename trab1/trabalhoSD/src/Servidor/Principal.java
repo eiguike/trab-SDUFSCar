@@ -20,7 +20,7 @@ public class Principal {
 		ArrayList<Server> list = new ArrayList<Server>();
 		Integer i;
 		Server server;
-		Integer threadsNum = 4;
+		Integer threadsNum = 1;
 
 		for (i = 0; i < threadsNum; i++) {
 			server = new Server(0 + i, 2 + i, threadsNum);

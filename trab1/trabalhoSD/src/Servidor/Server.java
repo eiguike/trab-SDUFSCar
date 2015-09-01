@@ -20,6 +20,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -48,6 +50,7 @@ public class Server extends Thread {
 	private Integer ACKs;
 	private Boolean waitingToSend;
 	private Socket clientMessage = null;
+	private Boolean alreadySend;
 
 	// Construtor do servidor, ainda não com a thread criada...
 	Server(Integer i, Integer clock, Integer threadsNum) {
@@ -81,12 +84,15 @@ public class Server extends Thread {
 		Integer i;
 		Client auxClient;
 		Node aux = null;
+		this.alreadySend = false;
 
 		// Loop para manter as threads vivas e com o servidor aberto
 		do {
 			try {
+				aux = null;
 				// Abrindo o socket na porta 8000
 				server = new ServerSocket(8000 + actualNode.getId());
+				server.setSoTimeout(1000);
 				// Aguarda uma conexão na porta especificada e retorna o socket que irá comunicar
 				//System.out.println(actualNode.getId()+ ": Pronto para receber mensagens...");
 				client = server.accept();
@@ -98,8 +104,6 @@ public class Server extends Thread {
 				}
 
 				input = new ObjectInputStream(client.getInputStream());
-
-				//quando a mensagem é recebida, ele adiciona na fila
 				aux = (Node) input.readObject();
 
 				if (aux.isSend()) {
@@ -113,19 +117,20 @@ public class Server extends Thread {
 					auxClient.start();
 					listClient.add(auxClient);
 				} else {
-					actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
 					System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
-                                        if (!aux.isThank()) {
+					if (!aux.isThank()) {
+						// quando um processo manda mensagem, seus acks são zerados
+						this.ACKs = 0;
+						this.alreadySend = true;
+						actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
 						// e enviado uma mensagem de agradecimento, posteriormente
 						// é adicionado na fila
 						System.out.println(actualNode.getId() + ": Recebi mensagem de: " + aux.getId());
 						actualNode.setThank(true);
 						actualNode.setIdTarget(aux.getId());
-						if (!actualNode.getId().equals(aux.getId())) {
-							auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
-							auxClient.start();
-							listClient.add(auxClient);
-						}
+						auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+						auxClient.start();
+						listClient.add(auxClient);
 						queue.add(aux);
 					} else {
 						// se não for uma mensagem de comando, é avisado que recebeu ACK do processo
@@ -133,21 +138,37 @@ public class Server extends Thread {
 						// de threads existentes, é setado em true uma flag waitingToSend
 						System.out.println(actualNode.getId() + ": Recebi ACK de " + aux.getId());
 						this.ACKs++;
-						if ((ACKs.equals(this.threadsNum - 1))) {
+						if ((ACKs.equals(this.threadsNum))) {
 							System.out.println(actualNode.getId() + ": Só esperando minha vez...");
 							this.waitingToSend = true;
 						}
 						// mensagem normal de pedido
 					}
 				}
-
 				server.close();
 				client.close();
 
 			} catch (IOException e) {
+				// verificado se todos mandaram acks, se não mandaram
+				// reenviar a mensagem
+				if (this.alreadySend) {
+
+				}
+
+				try {
+					server.close();
+					if (client != null) {
+						client.close();
+					}
+				} catch (SocketException ex) {
+					Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+				} catch (IOException ex) {
+					Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+				}
 			} catch (ClassNotFoundException ex) {
 				Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 			}
+
 		} while (true);
 	}
 }
