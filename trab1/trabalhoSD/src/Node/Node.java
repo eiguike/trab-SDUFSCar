@@ -15,7 +15,16 @@ public class Node implements Serializable{
 	private Integer clock;
 	private Integer id;
 	private boolean thank;
+	private boolean send;
 	private Integer idTarget;
+
+	public boolean isSend() {
+		return send;
+	}
+
+	public void setSend(boolean send) {
+		this.send = send;
+	}
 
 	public Integer getIdTarget() {
 		return idTarget;
