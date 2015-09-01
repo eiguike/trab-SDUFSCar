@@ -108,13 +108,14 @@ public class Server extends Thread {
 					System.out.println(actualNode.getId() + ": Recebi comando de enviar mensagem...");
 					actualNode.setThank(false);
 					actualNode.setSend(false);
-					actualNode.setClock(actualNode.getClock() + 1);
+					//actualNode.setClock(actualNode.getClock() + 1);
 					auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 					auxClient.start();
 					listClient.add(auxClient);
 				} else {
 					actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
-					if (!aux.isThank()) {
+					System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
+                                        if (!aux.isThank()) {
 						// e enviado uma mensagem de agradecimento, posteriormente
 						// é adicionado na fila
 						System.out.println(actualNode.getId() + ": Recebi mensagem de: " + aux.getId());

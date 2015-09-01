@@ -53,6 +53,9 @@ public class Client extends Thread {
 				if (actualNode.isSend()) {
 					System.out.println("Estou enviando comando para " + actualNode.getIdTarget());
 				} else {
+                                        actualNode.setClock(actualNode.getClock() + 1);
+                                        System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
+                                        
 					System.out.println(actualNode.getId() + ": Enviando mensagem de agradecimento para " + actualNode.getIdTarget());
 				}
 				try {
@@ -78,6 +81,10 @@ public class Client extends Thread {
 					}
 				}
 			} else {
+                            
+                                actualNode.setClock(actualNode.getClock() + 1);
+                                System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
+                                
 				System.out.println(actualNode.getId() + ": Enviando mensagem para todos");
 				for (i = 0; i < threadsNum; i++) {
 					try {
