@@ -169,6 +169,7 @@ public class Server extends Thread {
                                 auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
                                 auxClient.start();
                                 queueProcess.add(aux);
+                                Collections.sort(queueProcess,clockComparator);
                             } else {
                                 // se não for uma mensagem de comando, é avisado que recebeu ACK do processo
                                 // e então adicionado no númeor de ACKs, caso os ACKs sejam iguais o númeor
@@ -176,9 +177,9 @@ public class Server extends Thread {
                                 acks[aux.getIdTarget()]++;
                                 System.out.println("|0:| " + acks[0] + "|1:| "+acks[1]+"|2:| "+acks[2]);
                                 if(!queueProcess.isEmpty() && acks[(queueProcess.get(0)).getId()] == threadsNum){
+                                    System.out.println(actualNode.getId() + ": Removi da fila" + (queueProcess.get(0)).getId());
                                     acks[(queueProcess.get(0)).getId()] = 0;
                                     queueProcess.remove(0);
-                                    System.out.println(actualNode.getId() + ": Removi da fila");
                                 }
 
                             }
