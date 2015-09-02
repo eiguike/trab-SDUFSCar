@@ -17,6 +17,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,8 +30,7 @@ public class Server extends Thread {
 
 	// informações de outros nós e do nó atual
 	private ArrayList<Node> queue;
-	private Integer mId;
-        private MessageHandler messageHandler;
+        private Node actualNode;
 
 	// variáveis necessárias para os sockets
 	private Thread t;
@@ -50,13 +50,14 @@ public class Server extends Thread {
 	// Construtor do servidor, ainda não com a thread criada...
 	Server(Integer i, Integer clock, Integer threadsNum) {
 
-                this.mId = i;
+                actualNode = new Node();
+                actualNode.setClock(clock);
+                actualNode.setId(i);
             
 		this.ACKs = 0;
 		this.waitingToSend = false;
 		this.threadsNum = threadsNum;
                 
-                this.messageHandler = new MessageHandler(i, clock, threadsNum);
 
 		// nome da thread, ou o q identifica o nó
 		threadName = "Servidor" + i;
@@ -75,7 +76,7 @@ public class Server extends Thread {
 
 	// Sobre carga da função run da biblioteca Thread
 	public void run() {
-                messageHandler.start();
+                startMessageHandler();
 		Integer i;
                 alreadySent = false;
 		Client auxClient;
@@ -84,7 +85,7 @@ public class Server extends Thread {
 		do {
 			try {
 				// Abrindo o socket na porta 8000
-				server = new ServerSocket(8000 + mId);
+				server = new ServerSocket(8000 + actualNode.getId());
 				server.setSoTimeout(1000);
 				// Aguarda uma conexão na porta especificada e retorna o socket que irá comunicar
 				//System.out.println(actualNode.getId()+ ": Pronto para receber mensagens...");
@@ -97,8 +98,10 @@ public class Server extends Thread {
 				}
 
 				input = new ObjectInputStream(client.getInputStream());
-				messageHandler.addMessage((Node) input.readObject());
-				
+				synchronized(queue) {
+                                    queue.add((Node) input.readObject());
+                                }
+                                        
 				server.close();
 				client.close();
 
@@ -125,4 +128,73 @@ public class Server extends Thread {
 
 		} while (true);
 	}
+        
+        public void startMessageHandler() {
+            (new Thread() {
+                @Override
+                public void run() {
+                    Random seed = new Random();
+                    Boolean alreadySent = false;
+                    Client auxClient;
+                    Node aux;
+                    queue = new ArrayList<Node>();
+
+                    try {
+                            Thread.sleep(seed.nextInt(1000));
+                    } catch (InterruptedException ex) {
+                            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    do {
+                        aux = null;
+                        synchronized(queue) {
+                            if (!queue.isEmpty()) {
+                                aux = queue.get(0);
+                            }
+                        }
+                        if (aux != null) {
+                            if (aux.isSend()) {
+                                // caso a mensagem seja de comando, então é feito o envio para todas os
+                                // processos que o processo atual quer utilizar tal recurso
+                                System.out.println(actualNode.getId() + ": Recebi comando de enviar mensagem...");
+                                actualNode.setThank(false);
+                                actualNode.setSend(false);
+                                //actualNode.setClock(actualNode.getClock() + 1);
+                                auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+                                auxClient.start();
+                            } else {
+                                System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
+                                if (!aux.isThank()) {
+                                    // quando um processo manda mensagem, seus acks são zerados
+                                    ACKs = 0;
+                                    alreadySent = true;
+                                    actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
+                                    // e enviado uma mensagem de agradecimento, posteriormente
+                                    // é adicionado na fila
+                                    System.out.println(actualNode.getId() + ": Recebi mensagem de: " + aux.getId());
+                                    actualNode.setThank(true);
+                                    actualNode.setIdTarget(aux.getId());
+                                    auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+                                    auxClient.start();
+                                } else {
+                                    // se não for uma mensagem de comando, é avisado que recebeu ACK do processo
+                                    // e então adicionado no númeor de ACKs, caso os ACKs sejam iguais o númeor
+                                    // de threads existentes, é setado em true uma flag waitingToSend
+                                    System.out.println(actualNode.getId() + ": Recebi ACK de " + aux.getId());
+                                    ACKs++;
+                                    if ((ACKs.equals(threadsNum))) {
+                                        System.out.println(actualNode.getId() + ": Só esperando minha vez...");
+                                        //this.waitingToSend = true;
+                                    }
+                                // mensagem normal de pedido
+                                }
+                            }
+                            synchronized(queue) {
+                                queue.remove(0);
+                            }
+                        }
+                    } while (true);
+                }
+            }).start();
+        }
 }
