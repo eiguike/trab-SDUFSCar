@@ -149,7 +149,7 @@ public class Server extends Thread {
                         if (aux.isSend()) {
                             // caso a mensagem seja de comando, então é feito o envio para todas os
                             // processos que o processo atual quer utilizar tal recurso
-                            System.out.println(actualNode.getClock()*10 + actualNode.getId() + ": Recebi comando de enviar mensagem...");
+                            //System.out.println(actualNode.getClock()*10 + actualNode.getId() + ": Recebi comando de enviar mensagem...");
                             actualNode.setThank(false);
                             actualNode.setSend(false);
                             //actualNode.setClock(actualNode.getClock() + 1);
@@ -175,9 +175,9 @@ public class Server extends Thread {
                                 // e então adicionado no númeor de ACKs, caso os ACKs sejam iguais o númeor
                                 // de threads existentes, é setado em true uma flag waitingToSend
                                 acks[aux.getIdTarget()]++;
-                                System.out.println("|0:| " + acks[0] + "|1:| "+acks[1]+"|2:| "+acks[2]);
+                                //System.out.println("|0:| " + acks[0] + "|1:| "+acks[1]+"|2:| "+acks[2]);
                                 if(!queueProcess.isEmpty() && acks[(queueProcess.get(0)).getId()] == threadsNum){
-                                    System.out.println(actualNode.getId() + ": Removi da fila" + (queueProcess.get(0)).getId());
+                                    System.out.println(actualNode.getClock()*10+actualNode.getId() + ": Removi da fila " + (queueProcess.get(0)).getId());
                                     acks[(queueProcess.get(0)).getId()] = 0;
                                     queueProcess.remove(0);
                                 }
