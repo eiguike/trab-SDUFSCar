@@ -25,7 +25,7 @@
 
 		Client(Integer i, Node message, Integer threadsNum) {
 			actualNode = message;
-			threadName = "Client " + i;
+			threadName = "Client" + i;
 			client = null;
 			this.threadsNum = threadsNum;
 		}

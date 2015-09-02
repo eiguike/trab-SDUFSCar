@@ -44,11 +44,9 @@ public class Server extends Thread {
 
     // variável que valida quando todos os processos
     // enviaram ACK par auma mensagem
-    private Integer ACKs;
     private Integer acks[];
     private Boolean waitingToSend;
     private Socket clientMessage = null;
-    private Boolean alreadySent;
 
     // Construtor do servidor, ainda não com a thread criada...
     Server(Integer i, Integer clock, Integer threadsNum) {
@@ -65,7 +63,7 @@ public class Server extends Thread {
 
         // nome da thread, ou o q identifica o nó
         threadName = "Servidor" + i;
-        System.out.println("Criando thread: " + threadName);
+        System.out.println("Criando processo: " + threadName);
         queue = new ArrayList<Node>();
         queueProcess = new ArrayList<Node>();
     }
@@ -149,16 +147,13 @@ public class Server extends Thread {
                         if (aux.isSend()) {
                             // caso a mensagem seja de comando, então é feito o envio para todas os
                             // processos que o processo atual quer utilizar tal recurso
-                            //System.out.println(actualNode.getClock()*10 + actualNode.getId() + ": Recebi comando de enviar mensagem...");
                             actualNode.setThank(false);
                             actualNode.setSend(false);
-                            //actualNode.setClock(actualNode.getClock() + 1);
                             auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
                             auxClient.start();
                         } else {
                             if (!aux.isThank()) {
                                 // quando um processo manda mensagem, seus acks são zerados
-                                ACKs = 0;
                                 alreadySent = true;
                                 actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
                                 // e enviado uma mensagem de agradecimento, posteriormente
@@ -170,16 +165,17 @@ public class Server extends Thread {
                                 auxClient.start();
                                 queueProcess.add(aux);
                                 Collections.sort(queueProcess,clockComparator);
+                                printQueue(queueProcess);
                             } else {
                                 // se não for uma mensagem de comando, é avisado que recebeu ACK do processo
                                 // e então adicionado no númeor de ACKs, caso os ACKs sejam iguais o númeor
                                 // de threads existentes, é setado em true uma flag waitingToSend
                                 acks[aux.getIdTarget()]++;
-                                //System.out.println("|0:| " + acks[0] + "|1:| "+acks[1]+"|2:| "+acks[2]);
                                 if(!queueProcess.isEmpty() && acks[(queueProcess.get(0)).getId()] == threadsNum){
                                     System.out.println(actualNode.getClock()*10+actualNode.getId() + ": Removi da fila " + (queueProcess.get(0)).getId());
                                     acks[(queueProcess.get(0)).getId()] = 0;
                                     queueProcess.remove(0);
+                                    printQueue(queueProcess);
                                 }
 
                             }
@@ -201,4 +197,17 @@ public class Server extends Thread {
             return id1 - id2;
         }
     };
+    public void printQueue(ArrayList<Node> queue) {
+        for (Integer i = 0; i < queue.size(); i++) {
+            System.out.print(queue.get(i).getId() + " " + queue.get(i).getClock());
+            if (i != queue.size()-1) {
+                System.out.print(", ");
+            } else {
+                System.out.println();
+            }
+        }
+        if (queue.isEmpty()) {
+            System.out.println("Fila vazia");
+        }
+    }
 }
