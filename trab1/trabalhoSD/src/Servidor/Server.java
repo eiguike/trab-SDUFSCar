@@ -1,10 +1,4 @@
 /*
- Trabalho de Redes - Servidor Multithread de Socket
- Henrique Teruo Eihara 	RA: 490016
- Charles David 		RA: 489662 
- */
-
-/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -35,7 +29,8 @@ public class Server extends Thread {
 
 	// informações de outros nós e do nó atual
 	private ArrayList<Node> queue;
-	private Node actualNode;
+	private Integer mId;
+        private MessageHandler messageHandler;
 
 	// variáveis necessárias para os sockets
 	private Thread t;
@@ -50,18 +45,18 @@ public class Server extends Thread {
 	private Integer ACKs;
 	private Boolean waitingToSend;
 	private Socket clientMessage = null;
-	private Boolean alreadySend;
+	private Boolean alreadySent;
 
 	// Construtor do servidor, ainda não com a thread criada...
 	Server(Integer i, Integer clock, Integer threadsNum) {
-		// define clock e a identificação do nó
-		actualNode = new Node();
-		actualNode.setClock(clock);
-		actualNode.setId(i);
 
+                this.mId = i;
+            
 		this.ACKs = 0;
 		this.waitingToSend = false;
 		this.threadsNum = threadsNum;
+                
+                this.messageHandler = new MessageHandler(i, clock, threadsNum);
 
 		// nome da thread, ou o q identifica o nó
 		threadName = "Servidor" + i;
@@ -80,18 +75,16 @@ public class Server extends Thread {
 
 	// Sobre carga da função run da biblioteca Thread
 	public void run() {
-		ArrayList<Client> listClient = new ArrayList<Client>();
+                messageHandler.start();
 		Integer i;
+                alreadySent = false;
 		Client auxClient;
-		Node aux = null;
-		this.alreadySend = false;
 
 		// Loop para manter as threads vivas e com o servidor aberto
 		do {
 			try {
-				aux = null;
 				// Abrindo o socket na porta 8000
-				server = new ServerSocket(8000 + actualNode.getId());
+				server = new ServerSocket(8000 + mId);
 				server.setSoTimeout(1000);
 				// Aguarda uma conexão na porta especificada e retorna o socket que irá comunicar
 				//System.out.println(actualNode.getId()+ ": Pronto para receber mensagens...");
@@ -104,54 +97,15 @@ public class Server extends Thread {
 				}
 
 				input = new ObjectInputStream(client.getInputStream());
-				aux = (Node) input.readObject();
-
-				if (aux.isSend()) {
-					// caso a mensagem seja de comando, então é feito o envio para todas os
-					// processos que o processo atual quer utilizar tal recurso
-					System.out.println(actualNode.getId() + ": Recebi comando de enviar mensagem...");
-					actualNode.setThank(false);
-					actualNode.setSend(false);
-					//actualNode.setClock(actualNode.getClock() + 1);
-					auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
-					auxClient.start();
-					listClient.add(auxClient);
-				} else {
-					System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
-					if (!aux.isThank()) {
-						// quando um processo manda mensagem, seus acks são zerados
-						this.ACKs = 0;
-						this.alreadySend = true;
-						actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
-						// e enviado uma mensagem de agradecimento, posteriormente
-						// é adicionado na fila
-						System.out.println(actualNode.getId() + ": Recebi mensagem de: " + aux.getId());
-						actualNode.setThank(true);
-						actualNode.setIdTarget(aux.getId());
-						auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
-						auxClient.start();
-						listClient.add(auxClient);
-						queue.add(aux);
-					} else {
-						// se não for uma mensagem de comando, é avisado que recebeu ACK do processo
-						// e então adicionado no númeor de ACKs, caso os ACKs sejam iguais o númeor
-						// de threads existentes, é setado em true uma flag waitingToSend
-						System.out.println(actualNode.getId() + ": Recebi ACK de " + aux.getId());
-						this.ACKs++;
-						if ((ACKs.equals(this.threadsNum))) {
-							System.out.println(actualNode.getId() + ": Só esperando minha vez...");
-							this.waitingToSend = true;
-						}
-						// mensagem normal de pedido
-					}
-				}
+				messageHandler.addMessage((Node) input.readObject());
+				
 				server.close();
 				client.close();
 
 			} catch (IOException e) {
 				// verificado se todos mandaram acks, se não mandaram
 				// reenviar a mensagem
-				if (this.alreadySend) {
+				if (this.alreadySent) {
 
 				}
 
