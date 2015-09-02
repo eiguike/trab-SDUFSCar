@@ -17,6 +17,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -99,7 +101,9 @@ public class Server extends Thread {
 
 				input = new ObjectInputStream(client.getInputStream());
 				synchronized(queue) {
+                                    System.out.println(actualNode.getId() + ": Inserindo mensagem na fila");
                                     queue.add((Node) input.readObject());
+                                    Collections.sort(queue, clockComparator);
                                 }
                                         
 				server.close();
@@ -197,4 +201,13 @@ public class Server extends Thread {
                 }
             }).start();
         }
+        
+        public static Comparator<Node> clockComparator = new Comparator<Node>() {
+            public int compare(Node message1, Node message2) {
+                Integer id1 = message1.getClock()*10 + message1.getId();
+                Integer id2 = message2.getClock()*10 + message2.getId();
+                
+                return id1 - id2;
+            }
+        };
 }
