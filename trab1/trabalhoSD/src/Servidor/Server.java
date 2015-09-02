@@ -44,6 +44,7 @@ public class Server extends Thread {
     // variável que valida quando todos os processos
     // enviaram ACK par auma mensagem
     private Integer ACKs;
+    private Integer acks[];
     private Boolean waitingToSend;
     private Socket clientMessage = null;
     private Boolean alreadySent;
@@ -55,7 +56,7 @@ public class Server extends Thread {
         actualNode.setClock(clock);
         actualNode.setId(i);
 
-        this.ACKs = 0;
+        acks = new Integer[threadsNum];
         this.waitingToSend = false;
         this.threadsNum = threadsNum;
 
