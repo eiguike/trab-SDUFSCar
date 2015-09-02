@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 public class Server extends Thread {
 
     // informações de outros nós e do nó atual
+    private ArrayList<Node> queueProcess;
     private ArrayList<Node> queue;
     private Node actualNode;
 
@@ -57,6 +58,8 @@ public class Server extends Thread {
         actualNode.setId(i);
 
         acks = new Integer[threadsNum];
+        Integer i2;
+        for(i2= 0; i2 < threadsNum; i2++) acks[i2] = 0;
         this.waitingToSend = false;
         this.threadsNum = threadsNum;
 
@@ -64,6 +67,7 @@ public class Server extends Thread {
         threadName = "Servidor" + i;
         System.out.println("Criando thread: " + threadName);
         queue = new ArrayList<Node>();
+        queueProcess = new ArrayList<Node>();
     }
 
     // Criando uma thread, no java cada thread executaria a função
@@ -79,7 +83,6 @@ public class Server extends Thread {
     public void run() {
         startMessageHandler();
         Integer i;
-        alreadySent = false;
         Client auxClient;
 
         // Loop para manter as thre ads vivas e com o servidor aberto
@@ -167,17 +170,19 @@ public class Server extends Thread {
                                 actualNode.setIdTarget(aux.getId());
                                 auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
                                 auxClient.start();
+                                queueProcess.add(aux);
                             } else {
                                 // se não for uma mensagem de comando, é avisado que recebeu ACK do processo
                                 // e então adicionado no númeor de ACKs, caso os ACKs sejam iguais o númeor
                                 // de threads existentes, é setado em true uma flag waitingToSend
-                                System.out.println(actualNode.getId() + ": Recebi ACK de " + aux.getId());
-                                ACKs++;
-                                if ((ACKs.equals(threadsNum))) {
-                                    System.out.println(actualNode.getId() + ": Só esperando minha vez...");
-                                    //this.waitingToSend = true;
+                                acks[aux.getIdTarget()]++;
+                                System.out.println("|0:| " + acks[0] + "|1:| "+acks[1]+"|2:| "+acks[2]);
+                                if(!queueProcess.isEmpty() && acks[(queueProcess.get(0)).getId()] == threadsNum){
+                                    acks[(queueProcess.get(0)).getId()] = 0;
+                                    queueProcess.remove(0);
+                                    System.out.println(actualNode.getId() + ": Removi da fila");
                                 }
-                                // mensagem normal de pedido
+
                             }
                         }
                         synchronized (queue) {
