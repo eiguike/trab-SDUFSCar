@@ -132,6 +132,11 @@ public class Server extends Thread {
                 Node aux;
                 queue = new ArrayList<Node>();
 
+                try {
+                    Thread.sleep(seed.nextInt(1000));
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
                 do {
                     aux = null;

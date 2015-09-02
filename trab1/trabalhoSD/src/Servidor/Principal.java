@@ -54,6 +54,11 @@ public class Principal {
 
 		} while(!input.isEmpty());
 
+   try {
+                    Thread.sleep(1000000);
+                } catch (InterruptedException ex) {
+                }
+
 	}
 
 }
