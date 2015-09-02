@@ -5,7 +5,6 @@
  */
 package Servidor;
 
-import Node.Node;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -17,17 +16,6 @@ import java.util.ArrayList;
 public class Principal {
 
 	public static void main(String[] args) throws IOException {
-		ArrayList<Server> list = new ArrayList<Server>();
-		Integer i;
-		Server server;
-		Integer threadsNum = 3;
-
-		for (i = 0; i < threadsNum; i++) {
-			server = new Server(0 + i, 2 + i, threadsNum);
-			server.start();
-			list.add(server);
-		}
-
 		Node aux = null;
 		Client message = null;
 		Scanner input = new Scanner(System.in);
