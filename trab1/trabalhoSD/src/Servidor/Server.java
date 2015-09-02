@@ -105,7 +105,6 @@ public class Server extends Thread {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 synchronized (queue) {
-                    System.out.println(actualNode.getId() + ": Inserindo mensagem na fila");
                     try {
                         queue.add((Node) input.readObject());
                     } catch (IOException ex) {
@@ -150,14 +149,13 @@ public class Server extends Thread {
                         if (aux.isSend()) {
                             // caso a mensagem seja de comando, então é feito o envio para todas os
                             // processos que o processo atual quer utilizar tal recurso
-                            System.out.println(actualNode.getId() + ": Recebi comando de enviar mensagem...");
+                            System.out.println(actualNode.getClock()*10 + actualNode.getId() + ": Recebi comando de enviar mensagem...");
                             actualNode.setThank(false);
                             actualNode.setSend(false);
                             //actualNode.setClock(actualNode.getClock() + 1);
                             auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
                             auxClient.start();
                         } else {
-                            System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
                             if (!aux.isThank()) {
                                 // quando um processo manda mensagem, seus acks são zerados
                                 ACKs = 0;
@@ -165,7 +163,7 @@ public class Server extends Thread {
                                 actualNode.setClock(Math.max(aux.getClock(), actualNode.getClock()) + 1);
                                 // e enviado uma mensagem de agradecimento, posteriormente
                                 // é adicionado na fila
-                                System.out.println(actualNode.getId() + ": Recebi mensagem de: " + aux.getId());
+                                System.out.println(actualNode.getClock()*10 + actualNode.getId() + ": Recebi mensagem de: " + aux.getId());
                                 actualNode.setThank(true);
                                 actualNode.setIdTarget(aux.getId());
                                 auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
