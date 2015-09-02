@@ -55,9 +55,8 @@
 						System.out.println("Estou enviando comando para " + actualNode.getIdTarget());
 					} else {
 	                                        actualNode.setClock(actualNode.getClock() + 1);
-	                                        System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
 	                                        
-						System.out.println(actualNode.getId() + ": Enviando mensagem de agradecimento para " + i);
+						System.out.println(actualNode.getClock()*10 + actualNode.getId() + ": Enviando mensagem de agradecimento para " + i);
 					}
 					try {
 						//Cria o socket com o recurso desejado na porta especificada  
@@ -85,9 +84,8 @@
 				} else {
 	                            
 	                                actualNode.setClock(actualNode.getClock() + 1);
-	                                System.out.println(actualNode.getId() + " clock: " + actualNode.getClock());
 	                                
-					System.out.println(actualNode.getId() + ": Enviando mensagem para todos");
+					System.out.println(actualNode.getClock()*10 + actualNode.getId() + ": Enviando mensagem para todos");
 					for (i = 0; i < threadsNum; i++) {
 						try {
 							//Cria o socket com o recurso desejado na porta especificada  
