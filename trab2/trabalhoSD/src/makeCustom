@@ -1,0 +1,6 @@
+#!/bin/bash
+
+javac ./Servidor/P1.java ./Servidor/Client.java ./Servidor/Node.java ./Servidor/Server.java
+javac ./Servidor/P2.java ./Servidor/Client.java ./Servidor/Node.java ./Servidor/Server.java
+javac ./Servidor/P3.java ./Servidor/Client.java ./Servidor/Node.java ./Servidor/Server.java
+javac ./Servidor/Principal.java ./Servidor/Client.java ./Servidor/Node.java ./Servidor/Server.java
