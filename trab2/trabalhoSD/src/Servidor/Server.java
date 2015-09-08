@@ -120,7 +120,7 @@ public class Server extends Thread {
 					} catch (ClassNotFoundException ex) {
 						Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 					}
-					Collections.sort(queue, clockComparator);
+					queue.notify();
 				}
 			} while (true);
 
@@ -155,7 +155,6 @@ public class Server extends Thread {
 					actualNode.setOk(true);
 					actualNode.setSend(false);
 					actualNode.setIdTarget(queueProcess.get(0).getId());
-					System.out.println(queueProcess.get(0).getId());
 
 					auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 					auxClient.start();
@@ -179,6 +178,12 @@ public class Server extends Thread {
 					synchronized (queue) {
 						if (!queue.isEmpty()) {
 							auxNode = queue.get(0);
+						}else{
+							try {
+								queue.wait();
+							} catch (InterruptedException ex) {
+								Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+							}
 						}
 					}
 
