@@ -50,7 +50,8 @@ public class Server extends Thread {
 
 	// variável que define o estado quando um processo
 	// esta acessando um recurso (hardware, etc)
-	private Boolean acessingResource;
+	private Integer QUEROTUILIZAR;
+	private Boolean ESTOUUTILIZANDO;
 
 	// Construtor do servidor, ainda não com a thread criada...
 	Server(Integer i, Integer clock, Integer threadsNum) {
@@ -73,7 +74,8 @@ public class Server extends Thread {
 		queue = new ArrayList<Node>();
 		queueProcess = new ArrayList<Node>();
 
-		acessingResource = false;
+		QUEROTUILIZAR = 0;
+		ESTOUUTILIZANDO = false;
 	}
 
 	// Criando uma thread, no java cada thread executaria a função
@@ -128,25 +130,38 @@ public class Server extends Thread {
 
 	}
 
-	public void startAcessingResource(){
+	public void startAcessingResource() {
 		(new Thread() {
 			@Override
-			public void run(){
+			public void run() {
+				Client auxClient;
 				Random seed = new Random();
-				
+				ESTOUUTILIZANDO = true;
+
 				// simulando o uso do recurso
 				try {
 					Thread.sleep(seed.nextInt(5000));
 				} catch (InterruptedException ex) {
 					Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
 				}
+				System.out.println("TERMINEI DE USAR O RECURSO...");
+				ESTOUUTILIZANDO = false;
 
 				// aqui deve-se mandar para todos que estão
 				// na fila esperando oa cesos do recurso
 				// uma mensagem de ok...
-
 				// definindo que já foi utilizado o recurso
-				acessingResource = false;
+				while (!queueProcess.isEmpty()) {
+					actualNode.setOk(true);
+					actualNode.setSend(false);
+					actualNode.setIdTarget(queueProcess.get(0).getId());
+					System.out.println(queueProcess.get(0).getId());
+
+					auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+					auxClient.start();
+
+					queueProcess.remove(0);
+				}
 			}
 		}).start();
 	}
@@ -155,56 +170,77 @@ public class Server extends Thread {
 		(new Thread() {
 			@Override
 			public void run() {
-				Random seed = new Random();
-				Boolean alreadySent = false;
 				Client auxClient;
-				Node aux;
-				queue = new ArrayList<Node>();
-
-				try {
-					Thread.sleep(seed.nextInt(1000));
-				} catch (InterruptedException ex) {
-					Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-				}
+				Node auxNode;
+				Integer oks = 0;
 
 				do {
-					aux = null;
+					auxNode = null;
 					synchronized (queue) {
 						if (!queue.isEmpty()) {
-							aux = queue.get(0);
+							auxNode = queue.get(0);
 						}
 					}
-					if (aux != null) {
-						if (aux.isSend()) {
-							// mensagem de comando, deve ser um amensagem para todos
+
+					// se conter uma mensagem, ele continua o passo
+					if (auxNode != null) {
+						if (auxNode.isSend()) {
+							// this.processo deve enviar mensagem para todos
 							actualNode.setSend(false);
 							actualNode.setOk(false);
 							auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 							auxClient.start();
+							QUEROTUILIZAR++;
 						} else {
-							if(aux.isOk()){
-								// 
-								System.out.println(actualNode.getId()+": Estou utilizando o recurso!!!!");
-							}else{
-								// é uma mensagem que tal processo qr utilizar o recurso
-								if(aux.getClock() < actualNode.getClock()){
-									// não respondo e utilizo o recurso
-									System.out.println(actualNode.getId()+ ": Estou utilizando o recurso e inseri "+aux.getId()+" na fila!");
-									queueProcess.add(aux);
-								}else{
-									// respondo com OK.
-									actualNode.setOk(true);
-									actualNode.setSend(false);
-									auxClient = new Client(actualNode.getId(),actualNode, threadsNum);
-									auxClient.start();
+							// não é uma mensagem de comando, logo pode ser um 
+							// OK ou então uma mensagem que tal processo
+							// utilizar o recurso
+							if (auxNode.isOk() == true) {
+								oks++;
+								if (oks.equals(threadsNum - 1)) {
+									System.out.println("TÔ UTILIZANDO ESSA DELICIA");
+									startAcessingResource();
+									QUEROTUILIZAR--;
+									oks = 0;
+								}
+							} else {
+								// mensagem de um processo querendo utilizar o recurso
+								if (ESTOUUTILIZANDO == true) {
+									queueProcess.add(auxNode);
+								} else {
+									if (QUEROTUILIZAR > 0) {
+										// ALGUMA HORA QUERO UTILIZAR
+										if (auxNode.getClock() < actualNode.getClock()) {
+											System.out.println("PERMITI FURAREM A FILA");
+											actualNode.setOk(true);
+											actualNode.setSend(false);
+											actualNode.setIdTarget(auxNode.getId());
+											auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+											auxClient.start();
+										} else {
+											// NÃO FAZ NADA, APENAS ESPERA OS OKS DA VIDA
+											// ele não adiciona na fila ele mesmo
+											// POSSÍVEL ERRO ESSE IF, NÃO SEI.....
+											if (!auxNode.getId().equals(actualNode.getId())) {
+												queueProcess.add(auxNode);
+												Collections.sort(queueProcess, clockComparator);
+											}
+										}
+									} else {
+										// ENVIAR OK QUANDO NAO QUERO UTILIZAR
+										actualNode.setOk(true);
+										actualNode.setSend(false);
+										actualNode.setIdTarget(auxNode.getId());
+										auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+										auxClient.start();
+									}
 								}
 							}
 						}
-						synchronized (queue) {
-							queue.remove(0);
-						}
+						queue.remove(0);
 					}
 				} while (true);
+
 			}
 		}).start();
 	}

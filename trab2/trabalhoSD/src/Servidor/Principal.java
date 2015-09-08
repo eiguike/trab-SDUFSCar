@@ -20,7 +20,7 @@ public class Principal {
 		ArrayList<Server> list = new ArrayList<Server>();
 		Integer i;
 		Server server;
-		Integer threadsNum = 4;
+		Integer threadsNum = 2;
 
 		Node aux = null;
 		Client message = null;
