@@ -43,7 +43,7 @@ public class Principal {
                 for (i = 0; i < 3; i++) {
                         aux = new Node();
 			aux.setSend(true);
-			aux.setOk(true);
+			aux.setAck(true);
 			aux.setClock(0);
 			aux.setId(-1);
 			aux.setIdTarget(i);

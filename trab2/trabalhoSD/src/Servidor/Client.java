@@ -49,13 +49,13 @@ public class Client extends Thread {
 		Boolean flag = true;
 		Integer i = 0;
 		do {
-			if (actualNode.isOk() == true) {
+			if (actualNode.isAck() == true) {
 				if (actualNode.isSend()) {
 					// seria a mensagem de comando
 					System.out.println("Estou enviando comando para " + actualNode.getIdTarget());
 				} else {
 					// seria a mensagem de OK
-                                        if (actualNode.isAllowed()) {
+                                        if (actualNode.isOk()) {
                                             System.out.println(actualNode.getClock() * 10 + actualNode.getId() + ": Enviando mensagem de OK para " + actualNode.getIdTarget());
                                         } else {
                                             System.out.println(actualNode.getClock() * 10 + actualNode.getId() + ": Negando o recurso para " + actualNode.getIdTarget());

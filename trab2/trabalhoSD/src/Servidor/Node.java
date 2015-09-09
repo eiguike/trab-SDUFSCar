@@ -14,8 +14,8 @@ import java.io.Serializable;
 public class Node implements Serializable{
 	private Integer clock;
 	private Integer id;
-	private boolean ok;
-        private boolean allowed;
+	private boolean ack;
+        private boolean ok;
 	private boolean send;
         private boolean wonPosition;
 
@@ -25,7 +25,7 @@ public class Node implements Serializable{
 		System.out.println("-----------------");
 		System.out.println("Clock: "+this.clock);
 		System.out.println("ID: "+this.id);
-		System.out.println("Thank: "+this.ok);
+		System.out.println("Thank: "+this.ack);
 		System.out.println("Send: "+this.send);
 		System.out.println("ID Target: "+this.idTarget);
 		System.out.println("-----------------");
@@ -47,20 +47,20 @@ public class Node implements Serializable{
 		this.idTarget = idTarget;
 	}
 
-	public boolean isOk() {
+	public boolean isAck() {
+		return ack;
+	}
+
+	public void setAck(boolean ack) {
+		this.ack = ack;
+	}
+        
+        public boolean isOk() {
 		return ok;
 	}
 
-	public void setOk(boolean thank) {
-		this.ok = thank;
-	}
-        
-        public boolean isAllowed() {
-		return allowed;
-	}
-
-	public void setAllowed(boolean allowed) {
-		this.allowed = allowed;
+	public void setOk(boolean ok) {
+		this.ok = ok;
 	}
         
         public boolean wonPosition() {
