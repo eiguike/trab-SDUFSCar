@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class Principal {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		ArrayList<Server> list = new ArrayList<Server>();
 		Integer i;
 		Server server;
@@ -26,7 +26,7 @@ public class Principal {
 		Client message = null;
 		Scanner input = new Scanner(System.in);
 		Integer cmd;
-		do {
+		/*do {
 			System.out.println("Estou pronto para receber comandos");
 			cmd = input.nextInt();
 			aux = new Node();
@@ -39,7 +39,19 @@ public class Principal {
 			message = new Client(-1, aux, 1);
 			message.start();
 
-		} while (true);
+		} while (true);*/
+                for (i = 0; i < 3; i++) {
+                        aux = new Node();
+			aux.setSend(true);
+			aux.setOk(true);
+			aux.setClock(0);
+			aux.setId(-1);
+			aux.setIdTarget(i);
+
+			message = new Client(-1, aux, 1);
+			message.start();
+                        Thread.sleep(4000);
+                }
 
 	}
 

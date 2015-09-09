@@ -55,7 +55,6 @@ public class Client extends Thread {
 					System.out.println("Estou enviando comando para " + actualNode.getIdTarget());
 				} else {
 					// seria a mensagem de OK
-					actualNode.setClock(actualNode.getClock() + 1);
                                         if (actualNode.isAllowed()) {
                                             System.out.println(actualNode.getClock() * 10 + actualNode.getId() + ": Enviando mensagem de OK para " + actualNode.getIdTarget());
                                         } else {
@@ -87,7 +86,6 @@ public class Client extends Thread {
 			} else {
 				// mensagem que o processo quer utilizar o recurso
 				// no caso é enviado para todos...
-				actualNode.setClock(actualNode.getClock() + 1);
 				System.out.println(actualNode.getClock() * 10 + actualNode.getId() + ": Enviando mensagem para todos");
 				for (i = 0; i < threadsNum; i++) {
 					try {

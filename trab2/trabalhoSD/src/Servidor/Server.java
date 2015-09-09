@@ -151,18 +151,25 @@ public class Server extends Thread {
 				// na fila esperando oa cesos do recurso
 				// uma mensagem de ok...
 				// definindo que já foi utilizado o recurso
-				while (!queueProcess.isEmpty()) {
+                                for (int i = 0; i<queueProcess.size(); i++) {                            
+				        actualNode.setClock(actualNode.getClock() + 1);
 					actualNode.setOk(true);
                                         actualNode.setAllowed(true);
 					actualNode.setSend(false);
-					actualNode.setIdTarget(queueProcess.get(0).getId());
+                                        actualNode.setWonPosition(false);
+					actualNode.setIdTarget(queueProcess.get(i).getId());
+                                        System.out.println(i + ": Enviando ok pro " + queueProcess.get(i).getId());
 
 					auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 					auxClient.start();
-
-					queueProcess.remove(0);
+                                        try {
+                                            Thread.sleep(5000);
+                                        } catch (InterruptedException ex) {
+                                            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
 				}
-			}
+                                queueProcess.clear();
+                        }
 		}).start();
 	}
 
@@ -192,9 +199,11 @@ public class Server extends Thread {
 					if (auxNode != null) {
 						if (auxNode.isSend()) {
 							// this.processo deve enviar mensagem para todos
+                                                        actualNode.setClock(actualNode.getClock() + 1);
 							actualNode.setSend(false);
 							actualNode.setOk(false);
                                                         actualNode.setAllowed(false);
+                                                        actualNode.setWonPosition(false);
 							auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 							auxClient.start();
 							QUEROTUILIZAR++;
@@ -203,10 +212,13 @@ public class Server extends Thread {
 							// OK ou então uma mensagem que tal processo
 							// utilizar o recurso
 							
-                                                        actualNode.setClock(Math.max(auxNode.getClock(), actualNode.getClock()) + 1);
                                                     
                                                         if (auxNode.isOk() == true && !auxNode.getId().equals(actualNode.getId())) {
-                                                                if (auxNode.isAllowed() == true) {        
+                                                                actualNode.setClock(Math.max(auxNode.getClock(), actualNode.getClock()) + 1);
+                                                                if (auxNode.isAllowed() == true) {
+                                                                        if (auxNode.wonPosition()) {
+                                                                            queueProcess.add(auxNode);
+                                                                        }
                                                                         oks++;
                                                                         if (oks.equals(threadsNum - 1) && !ESTOUUTILIZANDO) {
                                                                             System.out.println("TÔ UTILIZANDO ESSA DELICIA");
@@ -218,11 +230,14 @@ public class Server extends Thread {
 							} else if (!auxNode.getId().equals(actualNode.getId())) {
 								// mensagem de um processo querendo utilizar o recurso
 								if (ESTOUUTILIZANDO == true) {
+                                                                        actualNode.setClock(Math.max(auxNode.getClock(), actualNode.getClock()) + 1);
                                                                         System.out.println(auxNode.getId() + " NÃO VAI USAR AGORA");
 									queueProcess.add(auxNode);
+                                                                        actualNode.setClock(actualNode.getClock() + 1);
                                                                         actualNode.setOk(true);
 									actualNode.setSend(false);
                                                                         actualNode.setAllowed(false);
+                                                                        actualNode.setWonPosition(false);
 									actualNode.setIdTarget(auxNode.getId());
 									auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 									auxClient.start();
@@ -230,10 +245,14 @@ public class Server extends Thread {
 									if (QUEROTUILIZAR > 0) {
 										// ALGUMA HORA QUERO UTILIZAR
 										if (auxNode.getClock() < actualNode.getClock()) {
-											System.out.println("PERMITI FURAREM A FILA");
+                                                                                        actualNode.setClock(Math.max(auxNode.getClock(), actualNode.getClock()) + 1);
+											System.out.println("PERMITI FURAREM A FILA: " + auxNode.getClock() + " < " + actualNode.getClock());
+                                                                                        oks--;
+                                                                                        actualNode.setClock(actualNode.getClock() + 1);
 											actualNode.setOk(true);
 											actualNode.setSend(false);
                                                                                         actualNode.setAllowed(true);
+                                                                                        actualNode.setWonPosition(true);
 											actualNode.setIdTarget(auxNode.getId());
 											auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 											auxClient.start();
@@ -241,16 +260,27 @@ public class Server extends Thread {
 											// NÃO FAZ NADA, APENAS ESPERA OS OKS DA VIDA
 											// ele não adiciona na fila ele mesmo
 											// POSSÍVEL ERRO ESSE IF, NÃO SEI.....
+                                                                                        actualNode.setClock(Math.max(auxNode.getClock(), actualNode.getClock()) + 1);
 											if (!auxNode.getId().equals(actualNode.getId())) {
 												queueProcess.add(auxNode);
 												Collections.sort(queueProcess, clockComparator);
+                                                                                                actualNode.setClock(actualNode.getClock() + 1);
+                                                                                                actualNode.setOk(true);
+                                                                                                actualNode.setSend(false);
+                                                                                                actualNode.setAllowed(false);
+                                                                                                actualNode.setWonPosition(false);
+                                                                                                actualNode.setIdTarget(auxNode.getId());
+                                                                                                auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
+                                                                                                auxClient.start();
 											}
 										}
 									} else {
 										// ENVIAR OK QUANDO NAO QUERO UTILIZAR
+                                                                                actualNode.setClock(actualNode.getClock() + 1);
 										actualNode.setOk(true);
                                                                                 actualNode.setAllowed(true);
 										actualNode.setSend(false);
+                                                                                actualNode.setWonPosition(false);
 										actualNode.setIdTarget(auxNode.getId());
 										auxClient = new Client(actualNode.getId(), actualNode, threadsNum);
 										auxClient.start();

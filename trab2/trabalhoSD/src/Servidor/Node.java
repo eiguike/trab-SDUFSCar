@@ -17,6 +17,8 @@ public class Node implements Serializable{
 	private boolean ok;
         private boolean allowed;
 	private boolean send;
+        private boolean wonPosition;
+
 	private Integer idTarget;
 
 	public void printf(){
@@ -60,6 +62,14 @@ public class Node implements Serializable{
 	public void setAllowed(boolean allowed) {
 		this.allowed = allowed;
 	}
+        
+        public boolean wonPosition() {
+            return wonPosition;
+        }
+
+        public void setWonPosition(boolean wonPosition) {
+            this.wonPosition = wonPosition;
+        }
 
 	public Integer getClock() {
 		return clock;
