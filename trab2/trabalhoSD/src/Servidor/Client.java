@@ -56,8 +56,12 @@ public class Client extends Thread {
 				} else {
 					// seria a mensagem de OK
 					actualNode.setClock(actualNode.getClock() + 1);
-					System.out.println(actualNode.getClock() * 10 + actualNode.getId() + ": Enviando mensagem de OK para " + actualNode.getIdTarget());
-				}
+                                        if (actualNode.isAllowed()) {
+                                            System.out.println(actualNode.getClock() * 10 + actualNode.getId() + ": Enviando mensagem de OK para " + actualNode.getIdTarget());
+                                        } else {
+                                            System.out.println(actualNode.getClock() * 10 + actualNode.getId() + ": Negando o recurso para " + actualNode.getIdTarget());
+                                        }
+                                }
 				try {
 					//Cria o socket com o recurso desejado na porta especificada  
 					client = new Socket("127.0.0.1", 8000 + actualNode.getIdTarget());

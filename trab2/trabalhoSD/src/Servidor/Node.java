@@ -15,6 +15,7 @@ public class Node implements Serializable{
 	private Integer clock;
 	private Integer id;
 	private boolean ok;
+        private boolean allowed;
 	private boolean send;
 	private Integer idTarget;
 
@@ -50,6 +51,14 @@ public class Node implements Serializable{
 
 	public void setOk(boolean thank) {
 		this.ok = thank;
+	}
+        
+        public boolean isAllowed() {
+		return allowed;
+	}
+
+	public void setAllowed(boolean allowed) {
+		this.allowed = allowed;
 	}
 
 	public Integer getClock() {
