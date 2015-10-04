@@ -13,10 +13,10 @@ import java.util.logging.Logger;
  *
  * @author thiago
  */
-public class Main {
+public class P4 {
   
-  public static void main(String[] args) {
-    Node node0, node1, node2, node3;
-    node0 = new Node(0, 0);
+  public static void main(String[] args) throws InterruptedException {
+    Node node0;
+    node0 = new Node(4, 0);
   }
 }

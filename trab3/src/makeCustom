@@ -1,0 +1,11 @@
+#!/bin/bash
+rm ./*.class
+javac P0.java Client.java Node.java Package.java
+javac P1.java Client.java Node.java Package.java
+javac P2.java Client.java Node.java Package.java
+javac P3.java Client.java Node.java Package.java
+javac P4.java Client.java Node.java Package.java
+javac P5.java Client.java Node.java Package.java
+javac P6.java Client.java Node.java Package.java
+javac P7.java Client.java Node.java Package.java
+javac P8.java Client.java Node.java Package.java

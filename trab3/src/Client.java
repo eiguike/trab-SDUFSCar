@@ -29,8 +29,9 @@ public class Client extends Thread{
 	private BufferedReader input;
 	private ObjectOutputStream output;
 	
-	Client(Integer sourceid, Integer destid, ArrayList<Integer> minscost){
-		message = new Package(sourceid, destid, minscost);
+	Client(Integer clock, Integer pidTarget, Integer pidSource, Integer cmd){
+		message = new Package(clock, pidTarget, pidSource, cmd);
+		run();
 	}
 	
 	public void start(){
@@ -46,7 +47,7 @@ public class Client extends Thread{
 		// loop que enviara apenas para os nodes conectados entre si
 		try {
 			// tenta estabelecer uma conexão
-			client = new Socket("127.0.0.1", 8000 + message.getDest());
+			client = new Socket("127.0.0.1", 8000 + message.getPidTarget());
 			// prepara stream de saída
 			output = new ObjectOutputStream(client.getOutputStream());
 			// limpa a stream de saída
@@ -56,7 +57,7 @@ public class Client extends Thread{
 			// fecha a strema de saída
 			output.close();
 		} catch (IOException ex) {
-			Logger.getLogger(Node.class.getName()).log(Level.SEVERE, null, ex);
+			System.out.println("Não foi possível enviar a mensagem!");
 		} finally {
 			// finaliza client
 			try{

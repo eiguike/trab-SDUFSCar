@@ -27,7 +27,7 @@ public class Package implements Serializable {
 	private Integer Ok;
 
 	// 1 = ok, 2 = eleicao, 3 = definir clock, 4 = parar thread 
-	// 5 = iam alive
+	// 5 = iam the boss
 	private Integer cmd;
 
 	public Package(Integer clock, Integer pidTarget, Integer pidActual, Integer cmd) {
