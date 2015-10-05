@@ -58,7 +58,14 @@ public class Node {
 		Thread.sleep(5000);
 		multicastIAMALIVE();
 		
-		Thread.sleep(5000);
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		    public void run() {
+		        int i;
+			System.out.println(pid+" : Estou desligando..."); 	
+			for(i=0;i<nodesConected.size();i++)
+				new Client(0,i,pid,7);
+		    }
+		});
 	}
 	
 	public void multicastIAMALIVE(){
@@ -256,6 +263,14 @@ public class Node {
 									coordenador = new Timer(delay, taskPerformer2);
 									coordenador.start();
 								}
+							case 7:
+								System.out.println(pid+" : retirei o nó :" + aux.getPidSource());
+								for(i=0;i<nodesConected.size();i++)
+									if(nodesConected.get(i).equals(aux.getPidSource())){
+										nodesConected.remove(i);
+										break;
+									}
+								break;
 							
 							
 							default:
