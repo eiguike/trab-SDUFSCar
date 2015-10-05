@@ -77,7 +77,6 @@ public class Node {
 					public void actionPerformed(ActionEvent evt) {
 						int i;
 						if(theChosenOne.equals(pid)){
-							System.out.println("HEHEHE");
 							for(i=0;i<nodesConected.size();i++){
 								new Client(0, nodesConected.get(i), pid, 3);
 							}
@@ -114,7 +113,7 @@ public class Node {
 								return;
 							}else{
 								synchronized(message) {
-									System.out.println(pid+" : Recebi mensagem, adicionando na fila...");
+									//System.out.println(pid+" : Recebi mensagem, adicionando na fila...");
 									message.add(aux);
 									message.notify();
 								}
@@ -189,7 +188,6 @@ public class Node {
 
 							if(theChosenOne.equals(pid)){
 								new Client(0,aux.getPidSource(),pid, 5);
-								System.out.println("HUEHUEHUIAHSDLAJSDKÇJZXHCKÇ");
 							}
 						}
 						switch(aux.getCmd()){
@@ -217,7 +215,7 @@ public class Node {
 									// 5 segundos de espera para ser eleito
 									// assim que passa os 5 segundos, é mandado para todos os nodes
 									// que ele é o novo coordenador
-									int delay = 5000; //milliseconds
+									int delay = 2000; //milliseconds
 									
 									if(eleicao == null){
 										eleicao = new Timer(delay, taskPerformer);
@@ -289,7 +287,6 @@ public class Node {
 				Scanner input = new Scanner(System.in);
 				Integer cmd;
 				do {
-					System.out.println("Digite o novo valor de clock para este processo");
 					cmd = input.nextInt();
 					
 					switch(cmd){
@@ -312,6 +309,7 @@ public class Node {
 							break;
 						case 4:
 							System.out.println(pid+ " : O coordenador é: "+theChosenOne);
+							break;
 					}
 					
 					if(cmd.equals(-1)){
