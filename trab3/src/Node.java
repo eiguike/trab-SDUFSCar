@@ -27,49 +27,38 @@ public class Node {
 	private ObjectInputStream input;
 	private ServerSocket server;
 	private ArrayList<Package> message;
-
+	
 	// necessário para a construção do algoritmo valentão
 	private Integer clock;
-
+	
 	// variável que identifica quem esta eleito
 	private Integer theChosenOne;
-
+	
 	// Thread do servidor
 	private Thread serverThread;
-
+	
 	// nodes que estão conectados
 	private ArrayList<Integer> nodesConected;
-
+	
 	// construtor
 	public Node(Integer pid, Integer clock) throws InterruptedException {
 		this.clock = clock;
 		this.pid = pid;
-
+		
 		message = new ArrayList<Package>();
 		nodesConected = new ArrayList<Integer>();
-
+		
 		// todos os nodes não tem um líder estipulado ainda
 		this.theChosenOne = -1;
 		
 		server();
 		startMessageHandler();
 		inputCommands();
-
+		
 		Thread.sleep(5000);
 		multicastIAMALIVE();
-
+		
 		Thread.sleep(5000);
-		int i;
-		int maior = 0;
-		for(i=0;i<nodesConected.size();i++)
-			if(maior < nodesConected.get(i))
-				maior = nodesConected.get(i);
-		// manda mensagem que é o novo coordenador
-		if(maior == pid){
-			System.out.println("Sou o novo coordenador!!!");
-			for(i=0;i<nodesConected.size();i++)
-				new Client(0, nodesConected.get(i), pid, 5);
-		}
 	}
 	
 	public void multicastIAMALIVE(){
@@ -78,7 +67,7 @@ public class Node {
 			new Client(0, i, pid, 3);
 		}
 	}
-
+	
 	public void server() {
 		serverThread = (new Thread() {
 			@Override
@@ -87,18 +76,18 @@ public class Node {
 				ActionListener coordenadorTask = new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						int i;
-						System.out.println("HEHEHE");
 						if(theChosenOne.equals(pid)){
+							System.out.println("HEHEHE");
 							for(i=0;i<nodesConected.size();i++){
 								new Client(0, nodesConected.get(i), pid, 3);
 							}
 						}
-
+						
 					}
 				};
-				Timer coordenador = new Timer(1000, coordenadorTask); 
+				Timer coordenador = new Timer(2000, coordenadorTask);
 				coordenador.setRepeats(true);
-
+				
 				coordenador.start();
 				try {
 					server = new ServerSocket(8000+pid);
@@ -121,11 +110,11 @@ public class Node {
 									message.add(aux);
 									message.notify();
 								}
-
+								
 								return;
 							}else{
 								synchronized(message) {
-									//System.out.println(pid+" : Recebi mensagem, adicionando na fila...");
+									System.out.println(pid+" : Recebi mensagem, adicionando na fila...");
 									message.add(aux);
 									message.notify();
 								}
@@ -141,31 +130,36 @@ public class Node {
 		});
 		serverThread.start();
 	}
-
+	
 	// função que trata as mensagens recebidas
 	public void startMessageHandler(){
-
-
+		
 		(new Thread(){
 			@Override
 			public void run() {
 				Package aux;
 				Integer i = 0;
 				Timer eleicao = null;
-				Timer coordenador = null;
+				
 				ActionListener taskPerformer2 = new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						int i;
-						System.out.println(pid+" : Iniciando eleição, coordenador caiu!");
-						for(i=0;i<nodesConected.size();i++)
-							if(nodesConected.get(i) > pid)
+						System.out.println(pid+" : Iniciando eleição, coordenador caiu: "+ theChosenOne);
+						for(i=0;i<nodesConected.size();i++){
+							if(nodesConected.get(i) > pid){
 								new Client(0, nodesConected.get(i), pid, 2);
+							}
+							if(nodesConected.get(i).equals(theChosenOne))
+								nodesConected.remove(i);
+						}
+						
 					}
 				};
+				Timer coordenador = new Timer(5000, taskPerformer2);
 				ActionListener taskPerformer = new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						Integer i;
-						// quando o timer acaba, manda mensagem para todos que 
+						// quando o timer acaba, manda mensagem para todos que
 						// é o novo coordenador
 						System.out.println(pid+ " : Sou o novo coordenador!");
 						for(i=0;i<nodesConected.size();i++)
@@ -178,10 +172,10 @@ public class Node {
 					synchronized (message){
 						if(!message.isEmpty()) {
 							aux = message.remove(0);
-							 //System.out.println("node" + pid + ": mensagem de node" + aux.getPidSource()+ " recebida");
+							//System.out.println("node" + pid + ": mensagem de node" + aux.getPidSource()+ " recebida");
 						} else {
 							try {
-								 //System.out.println("node" + pid + ": esperando mensagens");
+								//System.out.println("node" + pid + ": esperando mensagens");
 								message.wait();
 							} catch(InterruptedException e) {
 								System.out.println(e);
@@ -189,6 +183,15 @@ public class Node {
 						}
 					}
 					if(aux != null){
+						if(nodesConected.contains(aux.getPidSource()) == false){
+							System.out.println(pid+ " : Adicionei "+aux.getPidSource()+" nos Nodes conectados!");
+							nodesConected.add(aux.getPidSource());
+
+							if(theChosenOne.equals(pid)){
+								new Client(0,aux.getPidSource(),pid, 5);
+								System.out.println("HUEHUEHUIAHSDLAJSDKÇJZXHCKÇ");
+							}
+						}
 						switch(aux.getCmd()){
 							case 1:
 								// caso receba um OK, ele apenas para o timer
@@ -203,21 +206,27 @@ public class Node {
 									// quando a mensagem de eleição veiod e um processo menor
 									// deve-se enviar uma mensagem de OK
 									new Client(0, aux.getPidSource(), pid, 1);
-								
+									
 									// quando recebe uma mensagem de eleição de um processo menor
 									// deve-se enviar uma mensagem de eleição para os outros
 									// processos de maior PID que o dele
 									for(i = 0; i < nodesConected.size(); i++)
 										if(nodesConected.get(i) > pid)
 											new Client(0, nodesConected.get(i), pid, 2);
-								
+									
 									// 5 segundos de espera para ser eleito
 									// assim que passa os 5 segundos, é mandado para todos os nodes
 									// que ele é o novo coordenador
 									int delay = 5000; //milliseconds
-
-									eleicao = new Timer(delay, taskPerformer);
-									eleicao.start();
+									
+									if(eleicao == null){
+										eleicao = new Timer(delay, taskPerformer);
+										eleicao.setRepeats(false);
+										eleicao.start();
+									}
+									else{
+										eleicao.restart();
+									}
 									
 								}
 								break;
@@ -225,15 +234,14 @@ public class Node {
 								// mensagem IAMALIVE que tem como siginifcado
 								// que tal node está vivo e pode receber/enviar
 								// mensagens
-								if(aux.getPidSource() == theChosenOne){
+								if(aux.getPidSource().equals(theChosenOne)){
 									// reseta o timer do coordenador
-									coordenador.restart();
+									if(coordenador != null)
+										coordenador.restart();
 								}
 
-								if(nodesConected.contains(aux.getPidSource()) == false){
-									System.out.println(pid+ " : Adicionei "+pid+" nos Nodes conectados!");
-									nodesConected.add(aux.getPidSource());
-								}
+								new Client(0,aux.getPidSource(),pid,6);	
+								
 								break;
 							case 4:
 								System.out.println("Mensagme de auto destruicao");
@@ -244,22 +252,26 @@ public class Node {
 								theChosenOne = aux.getPidSource();
 								int delay = 10000;
 								System.out.println(pid+" : Novo coordenador: "+aux.getPidSource());
-								coordenador = new Timer(delay, taskPerformer2);
-								coordenador.start();
-
-
+								if(coordenador != null)
+									coordenador.restart();
+								else{
+									coordenador = new Timer(delay, taskPerformer2);
+									coordenador.start();
+								}
+							
+							
 							default:
 								break;
 						}
-
-
+						
+						
 					}
 				} while(true);
 			}
 			
 		}).start();
 	}
-
+	
 	// multicast
 	public void sendMessages(Integer cmd, Integer pidDest) {
 		Integer i;
@@ -272,13 +284,14 @@ public class Node {
 		(new Thread(){
 			@Override
 			public void run(){
+				int i;
 				Client message = null;
 				Scanner input = new Scanner(System.in);
 				Integer cmd;
 				do {
 					System.out.println("Digite o novo valor de clock para este processo");
 					cmd = input.nextInt();
-
+					
 					switch(cmd){
 						case -1:
 							new Client(0,pid,pid,4);
@@ -289,12 +302,22 @@ public class Node {
 						case 1:
 							new Client(0,pid,pid, 5);
 							break;
+						case 2:
+							for(i=0;i<nodesConected.size();i++)
+								System.out.print(nodesConected.get(i) + " ");
+							break;
+						case 3:
+							for(i=0;i<nodesConected.size();i++)
+								new Client(0, nodesConected.get(i), pid, 5);
+							break;
+						case 4:
+							System.out.println(pid+ " : O coordenador é: "+theChosenOne);
 					}
-
+					
 					if(cmd.equals(-1)){
 						new Client(0,pid,pid,4);
 					}
-				} while (true);				
+				} while (true);
 			}
 		}).start();
 	}
