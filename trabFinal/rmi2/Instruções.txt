@@ -1,0 +1,12 @@
+Para rodar no Linux:
+1 - Compile os arquivos em java:
+  javac Hello.java Server.java Client.java
+
+2 - Abra o servidor RMI:
+  rmiregistry &
+
+3 - Inicie o servidor e o cliente, respectivamente:
+  java Server
+  java Client
+
+4- DONE!
