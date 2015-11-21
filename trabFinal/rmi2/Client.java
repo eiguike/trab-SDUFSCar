@@ -41,9 +41,9 @@ public class Client {
   private boolean downloadVideo(String id){
     System.out.println("Recebendo vídeo "+id);
     try{
-      Item data = stub.downloadVideo(id);
+      byte [] bFile = stub.downloadVideo(id);
       FileOutputStream fileOutput = new FileOutputStream(id+".mp4");
-      fileOutput.write(data.getData());
+      fileOutput.write(bFile);
       fileOutput.close();
     } catch (IOException e){
       System.out.println(e);
@@ -58,5 +58,6 @@ public class Client {
     Client client  = new Client();
     client.setStub(args);
     //client.enviarVideo("123");
+    client.downloadVideo("123");
   }
 }
