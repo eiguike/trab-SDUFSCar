@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 public class Server implements Video{
   public Server(){}
 
-  public Item downloadVideo(String name){
+  public byte[] downloadVideo(String name){
     FileInputStream fileInputStream = null;
     File file = new File("./"+name+".mp4");
 
@@ -19,9 +19,7 @@ public class Server implements Video{
       fileInputStream = new FileInputStream(file);
       fileInputStream.read(bFile);
       fileInputStream.close();
-      Item data = new Item(name, bFile);
-
-      return data;
+      return bFile;
     }catch(IOException e){
       System.out.println(e);
     }
