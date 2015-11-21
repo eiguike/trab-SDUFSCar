@@ -11,7 +11,6 @@ public class Client {
       String host = (args.length < 1) ? null : args[0];
       Registry registry = LocateRegistry.getRegistry(host);
       stub = (Video) registry.lookup("Video");
-      enviarVideo("123");
     } catch (Exception e) {
       System.err.println("Client exception: " + e.toString());
       e.printStackTrace();
@@ -39,9 +38,25 @@ public class Client {
       System.out.println("O vídeo foi enviado com sucesso!");
   }
 
+  private boolean downloadVideo(String id){
+    System.out.println("Recebendo vídeo "+id);
+    try{
+      Item data = stub.downloadVideo(id);
+      FileOutputStream fileOutput = new FileOutputStream(id+".mp4");
+      fileOutput.write(data.getData());
+      fileOutput.close();
+    } catch (IOException e){
+      System.out.println(e);
+      return false;
+    }
+    System.out.println("Video "+id+"  salvo!");
+    return true;
+  }
+
   private Client() {}
   public static void main(String[] args) {
     Client client  = new Client();
     client.setStub(args);
+    //client.enviarVideo("123");
   }
 }
