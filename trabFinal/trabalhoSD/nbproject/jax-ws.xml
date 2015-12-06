@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jax-ws xmlns="http://www.netbeans.org/ns/jax-ws/1">
+  <services>
+    <service name="Calculadora">
+      <implementation-class>org.me.calculator.Calculadora</implementation-class>
+    </service>
+    <service name="Video">
+      <implementation-class>org.me.Video.Video</implementation-class>
+    </service>
+  </services>
+  <clients/>
+</jax-ws>
