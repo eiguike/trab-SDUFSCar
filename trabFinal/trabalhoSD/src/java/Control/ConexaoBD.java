@@ -9,7 +9,7 @@ public class ConexaoBD {
     private Connection myConnection;
 
     //Objeto usado para enviar comandos SQL no SGBD
-    Statement st;
+    public Statement st;
 
     // Variável que definira estado da conexão
     private boolean conectado;

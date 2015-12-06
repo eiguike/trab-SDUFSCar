@@ -41,7 +41,7 @@ public class OperacoesVideo {
 	
 	public boolean insertVideo(VideoModel video){
 		// transformando bytes[] em um File
-		File outputFile = new File("/tmp/"+video.getDescricao());
+		File outputFile = new File("/tmp/"+video.getId());
 		try{
 			FileOutputStream outputstream = new FileOutputStream(outputFile);
 			outputstream.write(video.getDados());
@@ -86,13 +86,14 @@ public class OperacoesVideo {
 		
 		// logo em seguida, realizar o insert do video no banco de dados relacional
 		ResultSet rs = null;
-		String texto_consulta = "INSERT INTO video (descricao,idDownload) VALUES('"+video.getDescricao()+
-			"','"+video.getIdDownload()+"');";
+		String texto_consulta = "INSERT INTO video (descricao,iddownload) VALUES('"+video.getDescricao()+
+			"','"+video.getId()+"');";
 		
 		System.out.println(texto_consulta);
 		try{
 			con.st.execute(texto_consulta);
 		}catch(SQLException e){
+      System.out.println(e);
 			return false;
 		}
 		return true;
