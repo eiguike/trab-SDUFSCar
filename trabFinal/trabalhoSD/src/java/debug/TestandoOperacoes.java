@@ -21,7 +21,7 @@ public class TestandoOperacoes {
 	
 	public static void main(String[] args){
 		FileInputStream fileInputStream = null;
-		File file = new File("/home/ricke/Downloads/67b.jpg");
+		File file = new File("/home/floss/Downloads/tc.pdf");
 		String descricao = "meu pé";
 		
 		byte[] bFile = new byte[(int) file.length()];
