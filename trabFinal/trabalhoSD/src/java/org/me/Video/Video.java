@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jws.WebService;
@@ -40,22 +41,22 @@ public class Video {
      * Web service operation
      */
     @WebMethod(operationName = "download")
-    public VideoModel download(@WebParam(name = "id") String id) {
+    public String download(@WebParam(name = "id") String id) {
         //TODO write your implementation code here:
         VideoModel vid = new VideoModel();
         vid.setId(id);
         OperacoesVideo vidOp = new OperacoesVideo(con);
-        vid = vidOp.downloadVideo(vid);
+        URL url = vidOp.downloadVideo(vid);
 
-        File outputFile = new File("/tmp/" + vid.getDescricao());
-        try {
-            FileOutputStream outputstream = new FileOutputStream(outputFile);
-            outputstream.write(vid.getDados());
-        } catch (IOException ex) {
-            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        File outputFile = new File("/tmp/" + vid.getDescricao());
+//       try {
+//            FileOutputStream outputstream = new FileOutputStream(outputFile);
+//            outputstream.write(vid.getDados());
+//        } catch (IOException ex) {
+//            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
-        return vid;
+        return url.toString();
     }
 
     /**

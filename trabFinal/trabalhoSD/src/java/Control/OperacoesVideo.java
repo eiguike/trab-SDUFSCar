@@ -9,18 +9,21 @@ package Control;
 import Model.VideoModel;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.IOUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -43,7 +46,7 @@ public class OperacoesVideo {
         this.con = new ConexaoBD();
     }
 
-    public VideoModel downloadVideo(VideoModel video) {
+    public URL downloadVideo(VideoModel video) {
         // precisamos buscar o id do video no S3
         String id = video.getId();
         ResultSet rs = null;
@@ -62,7 +65,7 @@ public class OperacoesVideo {
             System.out.println(e);
             return null;
         }
-        
+
         System.out.println(video.getDescricao());
         System.out.println(video.getIdDownload());
 
@@ -94,17 +97,30 @@ public class OperacoesVideo {
              * conditional downloading of objects based on modification times,
              * ETags, and selectively downloading a range of an object.
          */
-        System.out.println("Downloading an object");
-        S3Object object = s3.getObject(new GetObjectRequest(bucketName, video.getIdDownload()));
-        try {
-            byte [] buf = IOUtils.toByteArray(object.getObjectContent());
-            video.setDados(buf);
-        } catch (IOException ex) {
-            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-                 
-        return video;
+        java.util.Date expiration = new java.util.Date();
+        long msec = expiration.getTime();
+        msec += 1000 * 60 * 120; // 2 hour.
+        expiration.setTime(msec);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest
+                = new GeneratePresignedUrlRequest(bucketName, video.getIdDownload());
+        generatePresignedUrlRequest.setMethod(HttpMethod.GET); // Default.
+        generatePresignedUrlRequest.setExpiration(expiration);
+
+        URL url = s3.generatePresignedUrl(generatePresignedUrlRequest);
+  
+        
+//        System.out.println("Downloading an object");
+//        S3Object object = s3.getObject(new GetObjectRequest(bucketName, video.getIdDownload()));
+//        try {
+//            byte[] buf = IOUtils.toByteArray(object.getObjectContent());
+//            video.setDados(buf);
+//        } catch (IOException ex) {
+//            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
+//            return null;
+//        }
+
+        return url;
     }
 
     public boolean insertVideo(VideoModel video) {

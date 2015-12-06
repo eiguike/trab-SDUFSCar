@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,21 +29,14 @@ public class TestandoOperacoes1 {
         vidOp = new OperacoesVideo();
         VideoModel vid = new VideoModel();
         vid.setId("4");
-        vid = vidOp.downloadVideo(vid);
-        if (vid != null) {
+        URL url = vidOp.downloadVideo(vid);
+        if (url != null) {
             System.out.println("DEU CERTO!!!");
         } else {
             System.out.println("DEU ERRADO!!!");
             return;
         }
-
-        File outputFile = new File("/tmp/" + vid.getDescricao());
-        try {
-            FileOutputStream outputstream = new FileOutputStream(outputFile);
-            outputstream.write(vid.getDados());
-        } catch (IOException ex) {
-            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println(url.toString());
     }
 
 }
