@@ -51,35 +51,13 @@ public class TestandoOperacoes {
 		
     String videoId;
     
-		ConexaoBD con = new ConexaoBD();
-    ResultSet rs;
-    
-    char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-    StringBuilder sb = new StringBuilder();
-    while(true) {
-      Random random = new Random();
-      for (int i = 0; i < 8; i++) {
-        char c = chars[random.nextInt(chars.length)];
-        sb.append(c);
-      }
-      
-      videoId = sb.toString();
-
-      try{
-        rs = con.st.executeQuery("SELECT * FROM video WHERE iddownload = \'" + videoId + "\'");
-      }catch(SQLException e){
-        System.out.println(e);
-        return;
-      }
-        
-      if (!rs.next()) {
-        break;
-      }
-    }
    
     
 		OperacoesVideo vidOp;
 		vidOp = new OperacoesVideo();
+    
+    videoId = vidOp.geraChave();
+    
 		VideoModel vid = new VideoModel();
 		vid.setDados(bFile);
 		vid.setDescricao(descricao);

@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,5 +99,35 @@ public class OperacoesVideo {
 		}
 		return true;
 	}
+  
+  public String geraChave() throws SQLException {
+    String videoId;
+    ConexaoBD con = new ConexaoBD();
+    ResultSet rs = null;
+    
+    char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    StringBuilder sb = new StringBuilder();
+    while(true) {
+      Random random = new Random();
+      for (int i = 0; i < 8; i++) {
+        char c = chars[random.nextInt(chars.length)];
+        sb.append(c);
+      }
+      
+      videoId = sb.toString();
+
+      try{
+        rs = con.st.executeQuery("SELECT * FROM video WHERE iddownload = \'" + videoId + "\'");
+      }catch(SQLException e){
+        System.out.println(e);
+      }
+        
+      if (!rs.next()) {
+        break;
+      }
+    }
+    
+    return videoId;
+  }
 	
 }
