@@ -66,7 +66,7 @@ public class Video {
     //public Boolean upload(@WebParam(name = "descricao") String descricao, @WebParam(name = "video") byte[] video) {
     public Boolean upload(@WebParam(name = "descricao") String descricao, @WebParam(name = "video") String nomeVideo) {
         FileInputStream fileInputStream = null;
-        File file = new File("/home/ricke/Documents/git/trab-SDUFSCar/trabFinal/rmi2/123.mp4");
+        File file = new File(nomeVideo);
 
         byte[] bFile = new byte[(int) file.length()];
         try {
