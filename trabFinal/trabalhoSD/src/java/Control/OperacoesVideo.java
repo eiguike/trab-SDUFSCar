@@ -2,7 +2,6 @@
 Aqui nesta classe conterá todas as operações que devemos fazer no trabalho, sendo elas:
 - Download de um vídeo
 - Upload de um vídeo
-
  */
 package Control;
 
@@ -26,6 +25,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -108,8 +108,7 @@ public class OperacoesVideo {
         generatePresignedUrlRequest.setExpiration(expiration);
 
         URL url = s3.generatePresignedUrl(generatePresignedUrlRequest);
-  
-        
+
 //        System.out.println("Downloading an object");
 //        S3Object object = s3.getObject(new GetObjectRequest(bucketName, video.getIdDownload()));
 //        try {
@@ -119,13 +118,12 @@ public class OperacoesVideo {
 //            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
 //            return null;
 //        }
-
         return url;
     }
 
     public boolean insertVideo(VideoModel video) {
         // transformando bytes[] em um File
-        File outputFile = new File("/tmp/" + video.getDescricao());
+        File outputFile = new File("/tmp/" + video.getId());
         try {
             FileOutputStream outputstream = new FileOutputStream(outputFile);
             outputstream.write(video.getDados());
@@ -170,16 +168,47 @@ public class OperacoesVideo {
 
         // logo em seguida, realizar o insert do video no banco de dados relacional
         ResultSet rs = null;
-        String texto_consulta = "INSERT INTO video (descricao,idDownload) VALUES('" + video.getDescricao()
-                + "','" + video.getIdDownload() + "');";
+        String texto_consulta = "INSERT INTO video (descricao,iddownload) VALUES('" + video.getDescricao()
+                + "','" + video.getId() + "');";
 
         System.out.println(texto_consulta);
         try {
             con.st.execute(texto_consulta);
         } catch (SQLException e) {
+            System.out.println(e);
             return false;
         }
         return true;
+    }
+
+    public String geraChave() throws SQLException {
+        String videoId;
+        ConexaoBD con = new ConexaoBD();
+        ResultSet rs = null;
+
+        char[] chars = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+        StringBuilder sb = new StringBuilder();
+        while (true) {
+            Random random = new Random();
+            for (int i = 0; i < 8; i++) {
+                char c = chars[random.nextInt(chars.length)];
+                sb.append(c);
+            }
+
+            videoId = sb.toString();
+
+            try {
+                rs = con.st.executeQuery("SELECT * FROM video WHERE iddownload = \'" + videoId + "\'");
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
+
+            if (!rs.next()) {
+                break;
+            }
+        }
+
+        return videoId;
     }
 
 }
