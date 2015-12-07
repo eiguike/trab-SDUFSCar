@@ -121,15 +121,20 @@ public class OperacoesVideo {
         return url;
     }
 
-    public boolean insertVideo(VideoModel video) {
-        // transformando bytes[] em um File
+    public String insertVideo(VideoModel video) {
+        try {
+            // transformando bytes[] em um File
+            video.setId(geraChave());
+        } catch (SQLException ex) {
+            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
+        }
         File outputFile = new File("/tmp/" + video.getId());
         try {
             FileOutputStream outputstream = new FileOutputStream(outputFile);
             outputstream.write(video.getDados());
         } catch (IOException ex) {
             Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+            return null;
         }
 
         // devemos primeiramente tentar enviar o vídeo para a cloud
@@ -157,13 +162,13 @@ public class OperacoesVideo {
             System.out.println("AWS Error Code:   " + ase.getErrorCode());
             System.out.println("Error Type:       " + ase.getErrorType());
             System.out.println("Request ID:       " + ase.getRequestId());
-            return false;
+            return null;
         } catch (AmazonClientException ace) {
             System.out.println("Caught an AmazonClientException, which means the client encountered "
                     + "a serious internal problem while trying to communicate with S3, "
                     + "such as not being able to access the network.");
             System.out.println("Error Message: " + ace.getMessage());
-            return false;
+            return null;
         }
 
         // logo em seguida, realizar o insert do video no banco de dados relacional
@@ -176,9 +181,9 @@ public class OperacoesVideo {
             con.st.execute(texto_consulta);
         } catch (SQLException e) {
             System.out.println(e);
-            return false;
+            return null;
         }
-        return true;
+        return video.getId();
     }
 
     public String geraChave() throws SQLException {

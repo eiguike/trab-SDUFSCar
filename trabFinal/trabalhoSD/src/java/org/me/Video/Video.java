@@ -55,8 +55,11 @@ public class Video {
 //        } catch (IOException ex) {
 //            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-
-        return url.toString();
+        if (url != null) {
+            return url.toString();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -64,28 +67,26 @@ public class Video {
      */
     @WebMethod(operationName = "upload")
     //public Boolean upload(@WebParam(name = "descricao") String descricao, @WebParam(name = "video") byte[] video) {
-    public Boolean upload(@WebParam(name = "descricao") String descricao, @WebParam(name = "video") String nomeVideo) {
-        FileInputStream fileInputStream = null;
-        File file = new File(nomeVideo);
-
-        byte[] bFile = new byte[(int) file.length()];
-        try {
-            fileInputStream = new FileInputStream(file);
-            fileInputStream.read(bFile);
-            fileInputStream.close();
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+    public String upload(@WebParam(name = "descricao") String descricao, @WebParam(name = "video") byte[] bFile) {
+//        FileInputStream fileInputStream = null;
+//        File file = new File(nomeVideo);
+//
+//        byte[] bFile = new byte[(int) file.length()];
+//        byte[] bFile = new byte;
+//        try {
+//            fileInputStream = new FileInputStream(file);
+//            fileInputStream.read(bFile);
+//            fileInputStream.close();
+//        } catch (IOException e) {
+//            System.out.println(e);
+//        }
 
         OperacoesVideo vidOp = new OperacoesVideo(con);
         VideoModel vid = new VideoModel();
         vid.setDados(bFile);
         vid.setDescricao(descricao);
 
-        if (vidOp.insertVideo(vid)) {
-            return true;
-        } else {
-            return false;
-        }
+        return vidOp.insertVideo(vid);
+
     }
 }
