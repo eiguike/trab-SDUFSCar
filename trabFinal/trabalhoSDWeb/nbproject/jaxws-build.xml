@@ -26,22 +26,6 @@
             <isset property="conf.dir"/>
         </condition>
     </target>
-    <target name="wsimport-client-Calculadora" depends="wsimport-init">
-        <mkdir dir="${build.generated.dir}/jax-wsCache/Calculadora"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/Calculadora" destdir="${build.generated.dir}/jax-wsCache/Calculadora" wsdl="${basedir}/${conf-dir}xml-resources/web-service-references/Calculadora/wsdl/localhost_8080/trabalhoSD/Calculadora.wsdl" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:8080/trabalhoSD/Calculadora?wsdl" xnocompile="true" xendorsed="true">
-            <depends file="${basedir}/${conf-dir}xml-resources/web-service-references/Calculadora/wsdl/localhost_8080/trabalhoSD/Calculadora.wsdl"/>
-            <produces dir="${build.generated.dir}/jax-wsCache/Calculadora"/>
-        </wsimport>
-        <copy todir="${build.generated.sources.dir}/jax-ws">
-            <fileset dir="${build.generated.dir}/jax-wsCache/Calculadora">
-                <include name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-    <target name="wsimport-client-clean-Calculadora" depends="-init-project">
-        <delete dir="${build.generated.sources.dir}/jax-ws/org/me/calculator"/>
-        <delete dir="${build.generated.dir}/jax-wsCache/Calculadora"/>
-    </target>
     <target name="wsimport-client-Video" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/Video"/>
         <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/Video" destdir="${build.generated.dir}/jax-wsCache/Video" wsdl="${basedir}/${conf-dir}xml-resources/web-service-references/Video/wsdl/localhost_8080/trabalhoSD/Video.wsdl" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:8080/trabalhoSD/Video?wsdl" xnocompile="true" xendorsed="true">
@@ -58,5 +42,5 @@
         <delete dir="${build.generated.sources.dir}/jax-ws/org/me/video"/>
         <delete dir="${build.generated.dir}/jax-wsCache/Video"/>
     </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-Calculadora, wsimport-client-Video"/>
+    <target name="wsimport-client-generate" depends="wsimport-client-Video"/>
 </project>

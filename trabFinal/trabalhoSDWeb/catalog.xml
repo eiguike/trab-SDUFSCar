@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-    <system systemId="http://localhost:8080/trabalhoSD/Calculadora?wsdl" uri="src/conf/xml-resources/web-service-references/Calculadora/wsdl/localhost_8080/trabalhoSD/Calculadora.wsdl"/>
-    <system systemId="http://localhost:8080/trabalhoSD/Calculadora?xsd=1" uri="src/conf/xml-resources/web-service-references/Calculadora/wsdl/localhost_8080/trabalhoSD/Calculadora.xsd_1.xsd"/>
+    <system systemId="http://localhost:8080/trabalhoSD/Calculadora?wsdl" uri="src/conf/xml-resources/web-service-references/Calculadora_1/wsdl/localhost_8080/trabalhoSD/Calculadora.wsdl"/>
+    <system systemId="http://localhost:8080/trabalhoSD/Calculadora?xsd=1" uri="src/conf/xml-resources/web-service-references/Calculadora_1/wsdl/localhost_8080/trabalhoSD/Calculadora.xsd_1.xsd"/>
     <system systemId="http://localhost:8080/trabalhoSD/Video?wsdl" uri="src/conf/xml-resources/web-service-references/Video/wsdl/localhost_8080/trabalhoSD/Video.wsdl"/>
     <system systemId="http://localhost:8080/trabalhoSD/Video?xsd=1" uri="src/conf/xml-resources/web-service-references/Video/wsdl/localhost_8080/trabalhoSD/Video.xsd_1.xsd"/>
 </catalog>
