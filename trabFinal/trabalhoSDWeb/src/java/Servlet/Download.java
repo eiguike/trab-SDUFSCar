@@ -36,28 +36,14 @@ public class Download extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String id = request.getQueryString();
+        String id = request.getParameter("idVideo");
         String result = download(id);
 
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Download</title>");
-            out.println("</head>");
-            out.println("<body>");
 
-            out.println("<video width=\"400\" controls>");
-            out.println("<source src=\"" + result + "\" type=\"video/mp4\">");
-            out.println("<source src=\"" + result + "\" type=\"video/ogg\">");
-            out.println("Your browser does not support HTML5 video.");
-            out.println("</video>");
-            out.println("<br><a href=\""+result+"\">Download do vídeo</a>");
+            out.println("<div id=\"videoPlayer\" style=\"display: inline-block; float: left; box-shadow: 0px 0px 4px 0.1px rgb(200, 200, 200); width: 65%; padding-left: 5px; height: 100%;\">    <b id=\"nomeVideo\" style=\"padding-left: 20px;\">        Título do vídeo    </b>     <a href=\"" + result + "\" target=\"_blank\" download=\"video.mp4\"><img src=\"./baixar.png\" style=\"padding-left: 10px; padding-top: 10px;\" title=\"Download do vídeo\" height=\"20\"></a>    <div style=\"\" id=\"video\">        <video style=\"padding-bottom: 20px; padding-top: 15px; width: 95%; padding-left: 20px;\" controls=\"controls\">            <source src=\"" + result + "\" type=\"video/mp4\">            <source src=\"" + result + "\" type=\"video/ogg\">            Your browser does not support HTML5 video.        </video>    </div></div><div id=\"descricaoVideo\" style=\"background: white none repeat scroll 0% 0%; display: inline-block; box-shadow: 0px 0px 4px 0.1px rgb(200, 200, 200); margin-top: 2%; width: 32%; float: right; height: 100%;\">    <div style=\"margin:3%;\">        <b> Descrição do vídeo:</b>        <p>Meu pé é grande doi demais quando vou ojgar futebol,             isso porquê meu pé e grande e doid demais. Meu pé é grande doi demais             quando vou ojgar futebol, isso porquê meu pé e grande e doid demais. Meu            pé é grande doi demais quando vou ojgar futebol, isso porquê meu pé e             grande e doid demais. Meu pé é grande doi demais quando vou ojgar             futebol, isso porquê meu pé e grande e doid demais. Meu pé é grande doi             demais quando vou ojgar futebol, isso porquê meu pé e grande e doid             demais. Meu pé é grande doi demais quando vou ojgar futebol, isso porquê            meu pé e grande e doid demais. Meu pé é grande doi demais quando vou             ojgar futebol, isso porquê meu pé e grande e doid demais. Meu pé é             grande doi demais quando vou ojgar futebol, isso porquê meu pé e grande e            doid demais. Meu pé é grande doi demais quando vou ojgar futebol, isso             porquê meu pé e grande e doid demais. Meu pé é grande doi demais quando             vou ojgar futebol, isso porquê meu pé e grande e doid demais.</p>    </div></div>");
 
-            out.println("</body>");
-            out.println("</html>");
         }
     }
 

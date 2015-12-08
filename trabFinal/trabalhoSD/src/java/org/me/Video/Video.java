@@ -42,7 +42,7 @@ public class Video {
      */
     @WebMethod(operationName = "download")
     public String download(@WebParam(name = "id") String id) {
-        //TODO write your implementation code here:
+        System.out.println("HAHAHA"+id);
         VideoModel vid = new VideoModel();
         vid.setId(id);
         OperacoesVideo vidOp = new OperacoesVideo(con);

@@ -49,10 +49,22 @@ public class OperacoesVideo {
     public URL downloadVideo(VideoModel video) {
         // precisamos buscar o id do video no S3
         String id = video.getId();
+        int i;
         ResultSet rs = null;
         String aux = null;
-        String texto_consulta
+        String texto_consulta;
+        
+        // expressão regular para detectar se é um número ou 
+        // string
+        if(video.getId().matches("[0-9]+")){
+            texto_consulta
                 = "SELECT descricao, iddownload FROM video WHERE video.id='" + id + "';";
+        }else{
+            texto_consulta
+                = "SELECT descricao, iddownload FROM video WHERE video.iddownload='"+id+"';";
+        }
+
+        
         System.out.println(texto_consulta);
 
         try {
