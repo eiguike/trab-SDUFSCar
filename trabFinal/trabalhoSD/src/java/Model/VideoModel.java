@@ -10,49 +10,59 @@ package Model;
  * @author ricke
  */
 public class VideoModel {
-	private String descricao;
-	private byte[] dados;
-	private String id;
-	private String idDownload;
-	private String nomeArquivo;
 
-	public String getNomeArquivo() {
-		return nomeArquivo;
-	}
+    private String descricao;
+    private byte[] dados;
+    private String id;
+    private String idDownload;
+    private String nomeArquivo;
+    private String URL;
 
-	public void setNomeArquivo(String nomeArquivo) {
-		this.nomeArquivo = nomeArquivo;
-	}
+    public String getURL() {
+        return URL;
+    }
 
-	public String getDescricao() {
-		return descricao;
-	}
+    public void setURL(String URL) {
+        this.URL = URL;
+    }
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
+    public String getNomeArquivo() {
+        return nomeArquivo;
+    }
 
-	public byte[] getDados() {
-		return dados;
-	}
+    public void setNomeArquivo(String nomeArquivo) {
+        this.nomeArquivo = nomeArquivo;
+    }
 
-	public void setDados(byte[] dados) {
-		this.dados = dados;
-	}
+    public String getDescricao() {
+        return descricao;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public byte[] getDados() {
+        return dados;
+    }
 
-	public String getIdDownload() {
-		return idDownload;
-	}
+    public void setDados(byte[] dados) {
+        this.dados = dados;
+    }
 
-	public void setIdDownload(String idDownload) {
-		this.idDownload = idDownload;
-	}
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getIdDownload() {
+        return idDownload;
+    }
+
+    public void setIdDownload(String idDownload) {
+        this.idDownload = idDownload;
+    }
 }

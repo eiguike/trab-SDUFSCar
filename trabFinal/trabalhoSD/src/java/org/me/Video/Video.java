@@ -41,12 +41,11 @@ public class Video {
      * Web service operation
      */
     @WebMethod(operationName = "download")
-    public String download(@WebParam(name = "id") String id) {
-        System.out.println("HAHAHA"+id);
+    public VideoModel download(@WebParam(name = "id") String id) {
         VideoModel vid = new VideoModel();
         vid.setId(id);
         OperacoesVideo vidOp = new OperacoesVideo(con);
-        URL url = vidOp.downloadVideo(vid);
+        VideoModel retorno = vidOp.downloadVideo(vid);
 
 //        File outputFile = new File("/tmp/" + vid.getDescricao());
 //       try {
@@ -55,8 +54,8 @@ public class Video {
 //        } catch (IOException ex) {
 //            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-        if (url != null) {
-            return url.toString();
+        if (retorno != null) {
+            return retorno;
         } else {
             return null;
         }

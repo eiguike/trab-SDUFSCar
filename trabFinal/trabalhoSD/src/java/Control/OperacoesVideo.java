@@ -46,7 +46,7 @@ public class OperacoesVideo {
         this.con = new ConexaoBD();
     }
 
-    public URL downloadVideo(VideoModel video) {
+    public VideoModel downloadVideo(VideoModel video) {
         // precisamos buscar o id do video no S3
         String id = video.getId();
         int i;
@@ -130,7 +130,12 @@ public class OperacoesVideo {
 //            Logger.getLogger(OperacoesVideo.class.getName()).log(Level.SEVERE, null, ex);
 //            return null;
 //        }
-        return url;
+
+        VideoModel retorno = new VideoModel();
+        retorno.setIdDownload(id);
+        retorno.setURL(url.toString());
+        retorno.setDescricao(video.getDescricao());
+        return retorno;
     }
 
     public String insertVideo(VideoModel video) {
