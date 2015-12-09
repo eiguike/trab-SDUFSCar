@@ -8,8 +8,10 @@ package Servlet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -39,24 +41,50 @@ public class Upload extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response, String URL)
             throws ServletException, IOException {
+
+        
+        
+        String descricao = request.getParameter("descricao");
+        Part file = request.getPart("arquivo");
+        System.out.println(descricao);
+
+        String filename = file.getSubmittedFileName();
+        InputStream fileContent = file.getInputStream();
+//        OutputStream out1 = 
+        System.out.println(file.getSize());
+        byte[] bytes = new byte[(int) file.getSize()];
+        int bytesRead;
+
+        while ((bytesRead = fileContent.read(bytes)) != -1);
+//            out1.write(bytes, 0, bytesRead);
+//        }
+        fileContent.close();
+        
+//        out1.close();
+
+        String idvideo = upload(descricao, bytes);
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Upload</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Upload at " + request.getContextPath() + "</h1>");
-            out.println(request.getMethod());
-            out.println("</body>");
-            out.println("</html>");
+            out.println(idvideo);
         }
+        
+
+
+//
+//            /* TODO output your page here. You may use following sample code. */
+//            out.println("<!DOCTYPE html>");
+//            out.println("<html>");
+//            out.println("<head>");
+//            out.println("<title>Servlet Upload</title>");
+//            out.println("</head>");
+//            out.println("<body>");
+//            out.println("<h1>Servlet Upload at " + request.getContextPath() + "</h1>");
+//            out.println(request.getMethod());
+//            out.println("</body>");
+//            out.println("</html>");
+//        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -71,7 +99,9 @@ public class Upload extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("HUEHUEUHEU");
         processRequest(request, response, null);
+
     }
 
     /**
@@ -83,32 +113,10 @@ public class Upload extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String descricao = request.getParameter("descricao");
-        Part file = request.getPart("arquivo");
-        String filename = file.getSubmittedFileName();
-        InputStream fileContent = file.getInputStream();
-
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-        int nRead;
-        byte[] bFile;
-        byte[] data = new byte[16384];
-
-        while ((nRead = fileContent.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
-
-        buffer.flush();
-        
-        bFile = buffer.toByteArray();
-        
-        String URL = upload(descricao, bFile);       
-        
-        
-        processRequest(request, response, URL);
+        processRequest(request, response, "meupé");
     }
 
     /**
@@ -127,7 +135,5 @@ public class Upload extends HttpServlet {
         org.me.video.Video port = service.getVideoPort();
         return port.upload(descricao, video);
     }
-
-
 
 }

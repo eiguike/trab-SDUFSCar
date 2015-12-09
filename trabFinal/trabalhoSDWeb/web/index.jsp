@@ -79,62 +79,40 @@
 
         <div id="todoForm" style="display: inline-block; float: left; box-shadow: 0px 0px 4px 0.1px rgb(200, 200, 200); height: 100%; margin-top: 2%; margin-left: 2%; width: 96%;">
             <div id="formEnviar" style="margin:2%;">
-                <form action="" method="POST" enctype="multipart/form-data">
+                <form id="upload" action="/trabalhoSDWeb/Upload" method="POST" enctype="multipart/form-data">
                     <p>Arquivo do vídeo:</p> <input name="arquivo" size="chars" type="file"><br>
                     <p>Descrição do vídeo:</p>
                     <textarea name="descricao" cols="50" rows="4"></textarea><br>
                     <a class="botaoEnviarEnviar" style="padding-right: 15px; width: unset; padding-left: 15px;" id="button-holder">
                         <p style="line-height: 1px; color: rgb(183, 183, 183);">Submeter</p>
                     </a>
+                    <!--<input type="submit" value="Submit">-->
                 </form>         
             </div>
         </div>
 
         <!--Nessa parte será substituido pelo formulário-->
         <div id="todoVideo" style="height:100%;">
-            <div id="videoPlayer" style="display: inline-block; float: left; box-shadow: 0px 0px 4px 0.1px rgb(200, 200, 200); width: 65%; padding-left: 5px; height: 100%;">
-                <b id="nomeVideo" style="padding-left: 20px;">
-                    Bode doidão
-                </b> 
-                <div style="" id="video">
-                    <video style="padding-bottom: 20px; padding-top: 15px; width: 95%; padding-left: 20px;" controls="controls">
-                        <source src="https://trabalhosd.s3-sa-east-1.amazonaws.com/mwnn65vl?AWSAccessKeyId=AKIAJODUPR35QS2J2X3Q&Expires=1449560159&Signature=DSiV2MrADRBezVnJNKJN%2Bb43yIw%3D" type="video/mp4">
-                        <source src="https://trabalhosd.s3-sa-east-1.amazonaws.com/mwnn65vl?AWSAccessKeyId=AKIAJODUPR35QS2J2X3Q&Expires=1449560159&Signature=DSiV2MrADRBezVnJNKJN%2Bb43yIw%3D" type="video/ogg">
-                        Your browser does not support HTML5 video.
-                    </video>
-
-                </div>
-            </div>
-            <div id="descricaoVideo" style="background: white none repeat scroll 0% 0%; display: inline-block; box-shadow: 0px 0px 4px 0.1px rgb(200, 200, 200); margin-top: 2%; width: 32%; float: right; height: 100%;">
-                <div style="margin:3%;">
-                    <b> Descrição do vídeo:</b>
-                    <p>Meu pé é grande doi demais quando vou ojgar futebol, 
-                        isso porquê meu pé e grande e doid demais. Meu pé é grande doi demais 
-                        quando vou ojgar futebol, isso porquê meu pé e grande e doid demais. Meu
-                        pé é grande doi demais quando vou ojgar futebol, isso porquê meu pé e 
-                        grande e doid demais. Meu pé é grande doi demais quando vou ojgar 
-                        futebol, isso porquê meu pé e grande e doid demais. Meu pé é grande doi 
-                        demais quando vou ojgar futebol, isso porquê meu pé e grande e doid 
-                        demais. Meu pé é grande doi demais quando vou ojgar futebol, isso porquê
-                        meu pé e grande e doid demais. Meu pé é grande doi demais quando vou 
-                        ojgar futebol, isso porquê meu pé e grande e doid demais. Meu pé é 
-                        grande doi demais quando vou ojgar futebol, isso porquê meu pé e grande e
-                        doid demais. Meu pé é grande doi demais quando vou ojgar futebol, isso 
-                        porquê meu pé e grande e doid demais. Meu pé é grande doi demais quando 
-                        vou ojgar futebol, isso porquê meu pé e grande e doid demais.</p>
-                </div>
-
-            </div>
         </div>
 
 
 
-
+                <form id="dowlnoadHidden" action="" method="POST">
+                </form>
 
 
 
         <script>
-
+                $.ajax({// create an AJAX call...
+                    data: {idVideo:"6"},// get the form data
+                    type: $('#downloadHidden').attr('method'), // GET or POST
+                    url: "/trabalhoSDWeb/Download", // the file to call
+                    success: function (response) { // on success..
+                        $('#todoVideo').html(response); // update the DIV
+                        $('#todoVideo').show();
+                        $('#todoForm').hide(); // update the DIV
+                    }
+                });
             $('.botaoProcurar').click(function () { // catch the form's submit event
                 $.ajax({// create an AJAX call...
                     data: $('#download').serialize(), // get the form data
@@ -148,23 +126,59 @@
                 });
                 return false;
             });
+
+//USAGE: $("#form").serializefiles();
+            (function ($) {
+                $.fn.serializefiles = function () {
+                    var obj = $(this);
+                    /* ADD FILE TO PARAM AJAX */
+                    var formData = new FormData();
+                    $.each($(obj).find("input[type='file']"), function (i, tag) {
+                        $.each($(tag)[0].files, function (i, file) {
+                            formData.append(tag.name, file);
+                        });
+                    });
+                    var params = $(obj).serializeArray();
+                    $.each(params, function (i, val) {
+                        formData.append(val.name, val.value);
+                    });
+                    return formData;
+                };
+            })(jQuery);
+
             $('.botaoEnviarEnviar').click(function () { // catch the form's submit event
-                $.ajax({// create an AJAX call...
-                    data: $(this).serialize(), // get the form data
-                    type: $(this).attr('method'), // GET or POST
-                    url: "/trabalhoSDWeb/Upload", // the file to call
-                    success: function (response) { // on success..
-                        window.alert("ehehheeh");
+                var formData = new FormData($('#upload')[0]);
+                $.ajax({
+                    url: '/trabalhoSDWeb/Upload', //server script to process data
+                    type: 'POST',
+                    xhr: function () {  // custom xhr
+                        myXhr = $.ajaxSettings.xhr();
+                        if (myXhr.upload) { // if upload property exists
+//                            myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // progressbar
+                        }
+                        return myXhr;
                     },
-                    error: function (response) {
-                        window.alert("ahaha falhou");
-                    }
-                });
-                return false;
+                    //Ajax events
+                    success: function (data) {
+                        window.alert("Vídeo enviado com sucesso! Id:"+data);
+                    },
+                    error: errorHandler = function () {
+                        window.alert("não sucess");
+                    },
+                    // Form data
+                    data: formData,
+                    //Options to tell JQuery not to process data or worry about content-type
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                }, 'json');
             });
+            
             $('.botaoEnviar').click(function () { // catch the form's submit event
                 $('#todoForm').show(); // update the DIV
                 $('#todoPlayer').hide();
+                $('#descricaoVideo').hide();
+                $('#videoPlayer').hide();
                 return false;
             });
             $('#todoForm').hide();
