@@ -3,6 +3,6 @@ Este projeto tem como objetivo o desenvolvimento de um protótipo denomidado MyT
 - armazenar o vídeo nos servidores backend; e
 - permitir o download dos vídeos.
 
-Utilizamos a linguagem Java para desenvolver o web service, sendo o servlet para receber as requisições do browser, uma máquina EC2 que contém o PostgreSQL, que guardará o ID do vídeo no S3, e o Amazon S3 propriamente dito para guardar os vídeos na cloud.
+Utilizamos a linguagem Java para desenvolver o Web Service, o o servlet para receber as requisições do browser, uma máquina Amazon EC2 que contém o PostgreSQL que guardará o ID do vídeo no S3, e o Amazon S3 propriamente dito para guardar os vídeos na Cloud.
 
 Para utilizar este projeto, você deve baixar o AWS SDK Java e importar todas as bibliotecas necessárias.
